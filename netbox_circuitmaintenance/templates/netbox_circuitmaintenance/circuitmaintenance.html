@@ -1,0 +1,169 @@
+
+{% extends 'generic/object.html' %}
+{% load render_table from django_tables2 %}
+
+{% block content %}
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+
+        <h5 class="card-header">Maintenance Details</h5>
+
+        <div class="card-body">
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Maintenance ID</th>
+              <td>{{ object.name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Summary</th>
+                <td>{{ object.summary }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Status</th>
+                <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+              </tr>
+              <tr>
+                <th scope="row">Provider</th>
+                <td><a href="{% url 'circuits:provider' pk=object.provider.pk %}">{{ object.provider }}</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Start Date/Time</th>
+                <td>{{ object.start }}</td>
+              </tr>
+              <tr>
+                <th scope="row">End Date/Time</th>
+                <td>{{ object.end }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Internal Ticket #</th>
+                <td>{{ object.internal_ticket|placeholder }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Acknowledged</th>
+                <td>{{ object.acknowledged }}</td>
+              </tr>
+          </table>
+        </div>
+      </div>
+      {% include 'inc/panels/custom_fields.html' %}
+    </div>
+    <div class="col col-md-6">
+      {% include 'inc/panels/tags.html' %}
+      {% include 'inc/panels/comments.html' %}
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">Maintenance Impact</h5>
+        <div class="card-body">
+
+            {% if impacts %}
+                <table class="table table-hover">
+                    <tr>
+                        <th>Circuit ID</th>
+                        <th>Circuit Type</th>
+                        <th>Circuit Status</th>
+                        <th>Tenant</th>
+                        <th>Termination A</th>
+                        <th>Termination Z</th>
+                        <th>Impact</th>
+                        <th></th>
+                    </tr>
+                    {% for impact in impacts %}
+                    <tr>
+                        <td>{{impact.circuit|linkify}}</td>
+                        <td>{{impact.circuit.type|linkify }}</td>
+                        <td>{% badge impact.circuit.get_status_display bg_color=impact.circuit.get_status_color %}</td>
+                        <td>{{impact.circuit.tenant|linkify|placeholder  }}</td>
+                        <td>{{impact.circuit.termination_a|linkify|placeholder }}</td>
+                        <td>{{impact.circuit.termination_z|linkify|placeholder }}</td>
+                        <td>{% badge impact.get_impact_display bg_color=impact.get_impact_color %}</td>
+                        <td class="text-end noprint">
+                            {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_edit' pk=impact.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-warning btn-sm lh-1" title="Edit Impact">
+                                <i class="mdi mdi-pencil" aria-hidden="true"></i>
+                              </a>
+                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_delete' pk=impact.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Impact">
+                                <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i>
+                              </a>
+                            {% endif %}
+                          </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="text-muted">
+                    None
+                </div>
+            {% endif %}
+        </div>
+        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        <div class="card-footer text-end noprint">
+            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
+              <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Associate a Circuit Impact
+            </a>
+          </div>
+        {% else %}
+        <div class="card-footer text-end noprint">
+            This maintenance is Completed or Cancelled, the maintenance impact can no longer be modified.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">Recieved Maintenance Notifications</h5>
+        <div class="card-body">
+
+            {% if notifications %}
+                <table class="table table-hover">
+                    <tr>
+                        <th>Subject</th>
+                        <th>From</th>
+                        <th>Date Recieved</th>
+                        <th></th>
+                    </tr>
+                    {% for email in notifications %}
+                    <tr>
+                        <td>{{email.subject}}</td>
+                        <td>{{email.email_from}}</td>
+                        <td>{{email.email_recieved}}</td>
+                        <td class="text-end noprint">
+                            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification">
+                                <i class="mdi mdi-book" aria-hidden="true"></i>
+                              </a>
+                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">
+                                <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i>
+                              </a>
+                          </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="text-muted">
+                    No maintenance notifications have been recieved for this maintenance event
+                </div>
+            {% endif %}
+        </div>
+        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        <div class="card-footer text-end noprint">
+            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
+              <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Maintenance Notification
+            </a>
+          </div>
+        {% else %}
+        <div class="card-footer text-end noprint">
+            This maintenance is Completed or Cancelled, maintenance notifications can no longer be modified.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

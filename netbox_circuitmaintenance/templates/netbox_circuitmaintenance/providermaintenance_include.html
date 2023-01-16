@@ -1,0 +1,35 @@
+{% load helpers %}
+
+<div class="card">
+<h5 class="card-header">
+    Active / Upcoming Circuit Maintenances
+</h5>
+<div class="card-body">
+{% if circuitmaintenance %}
+    <table class="table table-hover">
+        <tr>
+            <th>Maintenance ID</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Circuit ID</th>
+            <th>Impact</th>
+        </tr>
+        {% for maintenance in circuitmaintenance %}
+        <tr>
+            <td>{{maintenance.circuitmaintenance|linkify}}</td>
+            <td>{{maintenance.circuitmaintenance.start}}</td>
+            <td>{{maintenance.circuitmaintenance.end}}</td>
+            <td>{% badge maintenance.circuitmaintenance.get_status_display bg_color=maintenance.circuitmaintenance.get_status_color %}</td>
+            <td>{{maintenance.circuit|linkify}}</td>
+            <td>{% badge maintenance.get_impact_display bg_color=maintenance.get_impact_color %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <div class="text-muted">
+            None
+        </div>
+    {% endif %}
+    </div>
+</div>
