@@ -31,6 +31,6 @@ setup(
     packages=find_packages(include=['netbox_circuitmaintenance', 'netbox_circuitmaintenance.*']),
     test_suite='tests',
     url='https://github.com/jasonyates/netbox_circuitmaintenance',
-    version='0.1.0',
+    version='0.2.1',
     zip_safe=False,
 )
