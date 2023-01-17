@@ -16,7 +16,7 @@ class CircuitMaintenanceTypeChoices(ChoiceSet):
         ('CANCELLED', 'Cancelled', 'gray'),
         ('IN-PROCESS', 'In-Process', 'orange'),
         ('COMPLETED', 'Completed', 'indigo'),
-        ('RESCHEDULED', 'Rescheduled', 'green'),
+        ('RE-SCHEDULED', 'Rescheduled', 'green'),
         ('UNKNOWN', 'Unknown', 'gray'),
     ]
 
