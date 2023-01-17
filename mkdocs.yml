@@ -1,6 +1,6 @@
 site_name: Netbox Circuit Maintenance Plugin
-site_url: https://jasonyates.github.io/netbox_circuitmaintenance
-repo_url: https://github.com/jasonyates/netbox_circuitmaintenance
+site_url: https://jasonyates.github.io/netbox-circuitmaintenance
+repo_url: https://github.com/jasonyates/netbox-circuitmaintenance
 repo_name: jasonyates/netbox_circuitmaintenance
 #strict: true
 nav:
@@ -60,7 +60,7 @@ extra:
       link: https://github.com/netbox-community/cookiecutter-netbox-plugin
       name: Facebook
     - icon: fontawesome/brands/github
-      link: https://github.com/jasonyates/netbox_circuitmaintenance
+      link: https://github.com/jasonyates/netbox-circuitmaintenance
       name: Github
     - icon: material/email
       link: "mailto:me@jasonyates.co.uk"
