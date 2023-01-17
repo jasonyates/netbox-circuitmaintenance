@@ -1,8 +1,8 @@
 from django import forms
-from netbox.forms import NetBoxModelForm
+from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm
 from utilities.forms import DateTimePicker, DynamicModelChoiceField
 from circuits.models import Provider, Circuit
-from .models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications
+from .models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications, CircuitMaintenanceTypeChoices, CircuitMaintenanceImpactTypeChoices
 
 class CircuitMaintenanceForm(NetBoxModelForm):
 
@@ -17,6 +17,49 @@ class CircuitMaintenanceForm(NetBoxModelForm):
             'start': DateTimePicker(),
             'end': DateTimePicker()
         }
+
+class CircuitMaintenanceFilterForm(NetBoxModelFilterSetForm):
+    model = CircuitMaintenance
+
+    name = forms.CharField(
+        required=False
+    )
+
+    summary = forms.CharField(
+        required=False
+    )
+
+    provider = forms.ModelMultipleChoiceField(
+        queryset=Provider.objects.all(),
+        required=False
+    )
+
+    status = forms.MultipleChoiceField(
+        choices=CircuitMaintenanceTypeChoices,
+        required=False
+    )
+
+    start = forms.CharField(
+        required=False
+    )
+
+    end = forms.CharField(
+        required=False
+    )
+
+    acknowledged = forms.BooleanField(
+        required=False
+    )
+
+    internal_ticket = forms.CharField(
+        required=False
+    )
+
+    impact = forms.ModelMultipleChoiceField(
+        queryset=CircuitMaintenanceImpact.objects.all(),
+        required=False
+    )
+
 
 class CircuitMaintenanceImpactForm(NetBoxModelForm):
 
