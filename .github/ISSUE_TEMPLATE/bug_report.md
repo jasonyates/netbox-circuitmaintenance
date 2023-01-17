@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Plugin version**
+What version of the plugin are you currently running? 
+
 **NetBox version**
 What version of NetBox are you currently running? 
 
