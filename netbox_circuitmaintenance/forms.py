@@ -1,9 +1,14 @@
 from django import forms
 from netbox.forms import NetBoxModelForm
-from utilities.forms import DateTimePicker
+from utilities.forms import DateTimePicker, DynamicModelChoiceField
+from circuits.models import Provider, Circuit
 from .models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications
 
 class CircuitMaintenanceForm(NetBoxModelForm):
+
+    provider = DynamicModelChoiceField(
+        queryset=Provider.objects.all()
+    )
 
     class Meta:
         model = CircuitMaintenance
@@ -15,7 +20,9 @@ class CircuitMaintenanceForm(NetBoxModelForm):
 
 class CircuitMaintenanceImpactForm(NetBoxModelForm):
 
-    CircuitMaintenance.objects.all()
+    circuit = DynamicModelChoiceField(
+        queryset=Circuit.objects.all()
+    )
 
     class Meta:
         model = CircuitMaintenanceImpact
