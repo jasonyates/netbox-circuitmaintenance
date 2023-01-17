@@ -66,6 +66,13 @@ Restart the Netbox service to apply changes:
 sudo systemctl restart netbox
 ```
 
+## Screenshots
+
+![Maintenance Event View](docs/img/maintenance.png)
+![Circuit Maintenance View](docs/img/circuit_maintenance.png)
+![Provider Maintenance View](docs/img/provider_maintenance.png)
+
+
 ## Credits
 
 Based on the NetBox plugin tutorial:
