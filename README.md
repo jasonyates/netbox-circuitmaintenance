@@ -14,7 +14,7 @@ Provides the ability to record circuit maintenance, maintenance impact and maint
 
 | NetBox Version | Plugin Version |
 |----------------|----------------|
-|     3.4        |      0.2.1     |
+|     3.4        |      0.2.2     |
 
 ## Installing
 
