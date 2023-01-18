@@ -135,7 +135,7 @@
                         <td>{{email.email_from}}</td>
                         <td>{{email.email_recieved}}</td>
                         <td class="text-end noprint">
-                            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification">
+                            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification" target="_blank">
                                 <i class="mdi mdi-book" aria-hidden="true"></i>
                               </a>
                               <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">

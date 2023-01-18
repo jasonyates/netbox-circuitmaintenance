@@ -51,8 +51,8 @@ class CircuitMaintenanceSerializer(NetBoxModelSerializer):
     )
 
     provider = NestedProviderSerializer()
-    impact = NestedCircuitMaintenanceImpactSerializer(many=True)
-    notification = NestedCircuitMaintenanceNotificationsSerializer(many=True)
+    impact = NestedCircuitMaintenanceImpactSerializer(required=False, many=True)
+    notification = NestedCircuitMaintenanceNotificationsSerializer(required=False, many=True)
 
     class Meta:
         model = CircuitMaintenance

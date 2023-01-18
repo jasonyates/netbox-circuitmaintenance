@@ -2,7 +2,7 @@
 
 __author__ = """Jason Yates"""
 __email__ = 'me@jasonyates.co.uk'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 from extras.plugins import PluginConfig

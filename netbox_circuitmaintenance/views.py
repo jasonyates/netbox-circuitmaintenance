@@ -1,7 +1,7 @@
 
 from netbox.views import generic
 from django.db.models import Count
-from . import forms, models, tables
+from . import forms, models, tables, filtersets
 
 # Circuit Maintenance Views
 class CircuitMaintenanceView(generic.ObjectView):
@@ -24,6 +24,8 @@ class CircuitMaintenanceListView(generic.ObjectListView):
         impact_count=Count('impact')
     )
     table = tables.CircuitMaintenanceTable
+    filterset = filtersets.CircuitMaintenanceFilterSet
+    filterset_form = forms.CircuitMaintenanceFilterForm
 
 class CircuitMaintenanceEditView(generic.ObjectEditView):
     queryset = models.CircuitMaintenance.objects.all()
