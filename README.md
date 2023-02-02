@@ -1,26 +1,30 @@
-=================================
 # Netbox Circuit Maintenance Plugin
-=================================
 
-NetBox plugin for managing Circuit Maintenance events.
+A NetBox plugin built to track circuit maintenance events, the plugin itself is agnostic in that it is only built to store data surrounding maintenance events and provide an overview of historical, active and upcoming circuit and provider maintenance events. The plugin tracks maintenance events at the provider level and associates impact from each event at the circuit level.
 
-See Github Feature Requests for upcoming list of features.
+The plugin does not directly provide an automated approach to ingesting provider notifications, instead it extends NetBox's extensive REST API and provides GET/POST/PUT/PATCH methods to manage maintenance events. The plugin is intended to be coupled with an automated parser to handle the parsing of provider notifications and the delivery of the maintenance events to the plugin's REST API. Several example parsers have been documented [here](parsers.md).
 
 ## Features
 
-Provides the ability to record circuit maintenance, maintenance impact and maintenance notifications in Netbox and link them to Providers and Circuits.
+ - Track provider maintenance events
+ - Track circuit impact from provider maintenance
+ - Provides a consolidated view of active, upcoming and historical maintenance events at the provider and circuit level
+ - Consolidated notifications (coming soon)
+ - Maintenance overlap detection (coming soon)
 
 ## Compatibility
-
+This plugin is only supported on NetBox 3.4 or higher, for exact compatibility information, see the table below.  
 | NetBox Version | Plugin Version |
-|----------------|----------------|
-|     3.4        |      0.2.2     |
+|--|--|
+| 3.4 | 0.2.2 |
+
+
 
 ## Installing
 
 A working installation of Netbox 3.4+ is required - [see official documentation](https://netbox.readthedocs.io/en/stable/plugins/).
 
-### Package Installation from PyPi
+### Package Installation
 
 Activate your virtual env and install via pip::
 

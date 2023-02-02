@@ -1,10 +1,13 @@
 site_name: Netbox Circuit Maintenance Plugin
 site_url: https://jasonyates.github.io/netbox-circuitmaintenance
 repo_url: https://github.com/jasonyates/netbox-circuitmaintenance
-repo_name: jasonyates/netbox_circuitmaintenance
+repo_name: jasonyates/netbox-circuitmaintenance
 #strict: true
 nav:
   - Home: index.md
+  - Automated Parsers: 
+    - Using a parser: parsers.md
+    - AWS SNS & Lambda: parsers_sns_lambda.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 theme:
@@ -53,12 +56,8 @@ extra:
   social:
     - icon: fontawesome/brands/twitter
       # replace with your own tweet link below
-      link: https://github.com/netbox-community/cookiecutter-netbox-plugin
+      link: https://www.twitter.com/jasonyates
       name: Tweet
-    - icon: fontawesome/brands/facebook
-      # replace with your own facebook link below
-      link: https://github.com/netbox-community/cookiecutter-netbox-plugin
-      name: Facebook
     - icon: fontawesome/brands/github
       link: https://github.com/jasonyates/netbox-circuitmaintenance
       name: Github
