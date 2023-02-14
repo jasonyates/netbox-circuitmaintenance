@@ -2,6 +2,8 @@
 from netbox.views import generic
 from django.db.models import Count
 from . import forms, models, tables, filtersets
+from django.views.generic import View
+from django.shortcuts import get_object_or_404, redirect, render
 
 # Circuit Maintenance Views
 class CircuitMaintenanceView(generic.ObjectView):
@@ -58,3 +60,12 @@ class CircuitMaintenanceNotificationView(generic.ObjectView):
 # CircuitMaintenanceSchedule 
 class CircuitMaintenanceScheduleView(generic.ObjectView):
     queryset = models.CircuitMaintenance.objects.all()
+
+
+class PollerResultView(View):
+   
+
+    def get(self, request, job_result_pk):
+        
+        return render(request, 'extras/script.html', {
+        })

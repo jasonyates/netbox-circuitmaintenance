@@ -31,5 +31,7 @@ urlpatterns = (
         'model': models.CircuitMaintenanceImpact
     }),
 
+    path('circuitmaintenancepoller/results/<int:job_result_pk>/', views.PollerResultView.as_view(), name='circuitmaintenancepoller_result'),
+
 
 )

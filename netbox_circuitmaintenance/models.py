@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from netbox.models import NetBoxModel
 from utilities.choices import ChoiceSet
 from django.urls import reverse
+from netbox.models.features import JobResultsMixin
 
 class CircuitMaintenanceTypeChoices(ChoiceSet):
 
@@ -180,3 +181,11 @@ class CircuitMaintenanceNotifications(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_circuitmaintenance:circuitnotification', args=[self.pk])
+
+class CircuitMaintenancePoller(JobResultsMixin, models.Model):
+    """
+    Dummy model used to generate permissions for reports. Does not exist in the database.
+    """
+    class Meta:
+        verbose_name = 'circuitmaintenancepoller'
+        managed = False
