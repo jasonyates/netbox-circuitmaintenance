@@ -1,6 +1,7 @@
 from django import forms
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm
-from utilities.forms import DateTimePicker, DynamicModelChoiceField
+from utilities.forms.fields import DynamicModelChoiceField
+from utilities.forms.widgets import DateTimePicker
 from circuits.models import Provider, Circuit
 from .models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications, CircuitMaintenanceTypeChoices, CircuitMaintenanceImpactTypeChoices
 
