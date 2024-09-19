@@ -14,7 +14,6 @@ urlpatterns = (
 
     path('circuitmaintenance/<int:pk>/', views.CircuitMaintenanceView.as_view(), name='circuitmaintenance'),
     path('circuitnotification/<int:pk>/', views.CircuitMaintenanceNotificationView.as_view(), name='circuitnotification'),
-    path('maintenanceschedule/', views.CircuitMaintenanceScheduleView.as_view(), name='maintenanceschedule'),
 
     path('circuitmaintenance/<int:pk>/edit/', views.CircuitMaintenanceEditView.as_view(), name='circuitmaintenance_edit'),
     path('circuitimpact/<int:pk>/edit/', views.CircuitMaintenanceImpactEditView.as_view(), name='circuitimpact_edit'),
@@ -30,6 +29,8 @@ urlpatterns = (
     path('circuitimpact/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='circuitmaintenance_changelog', kwargs={
         'model': models.CircuitMaintenanceImpact
     }),
+
+    path('maintenanceschedule/', views.CircuitMaintenanceScheduleView.as_view(), name='maintenanceschedule'),
 
 
 )

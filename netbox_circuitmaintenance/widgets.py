@@ -16,7 +16,7 @@ class ReminderWidget(DashboardWidget):
     def render(self, request):
         
         return render_to_string(self.template_name, {
-            'circuitmaintenance': CircuitMaintenance.objects.filter(status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RESCHEDULED', 'UNKNOWN']).annotate(
+            'circuitmaintenance': CircuitMaintenance.objects.filter(status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']).annotate(
                 impact_count=Count('impact')
             ),
         })

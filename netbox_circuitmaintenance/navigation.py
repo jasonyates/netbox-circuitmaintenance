@@ -14,10 +14,10 @@ menuitems = [
             )
         ]
     ),
-    #PluginMenuItem(
-    #    link='plugins:netbox_circuitmaintenance:maintenanceschedule',
-    #    link_text='Maintenance Schedule',
-    #),
+    PluginMenuItem(
+        link='plugins:netbox_circuitmaintenance:maintenanceschedule',
+        link_text='Maintenance Schedule',
+    ),
 ]
 
 menu = PluginMenu(
