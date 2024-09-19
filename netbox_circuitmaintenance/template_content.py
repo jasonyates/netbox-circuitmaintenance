@@ -1,4 +1,4 @@
-from extras.plugins import PluginTemplateExtension
+from netbox.plugins import PluginTemplateExtension
 from django.db.models import Q
 from .models import CircuitMaintenanceImpact 
 

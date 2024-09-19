@@ -1,0 +1,38 @@
+{% load helpers %}
+
+{% if circuitmaintenance %}
+    <table class="table table-hover object-list">
+    <thead>
+        <tr>
+            <th>Maintenance ID</th>
+            <th>Provider</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Acknowledged</th>
+            <th>Impacted Circuits</th>
+        </tr>
+    </thead>
+        {% for maintenance in circuitmaintenance %}
+        <tr>
+            <td>{{maintenance|linkify}}</td>
+            <td>{{maintenance.provider|linkify}}</td>
+            <td>{{maintenance.start}}</td>
+            <td>{{maintenance.end}}</td>
+            <td>{% badge maintenance.get_status_display bg_color=maintenance.circuitmaintenance.get_status_color %}</td>
+            <td>
+                {% if maintenance.acknowledged %}
+                <span class="true">✔</span>
+                {% else %}
+                <span class="false">✘</span>
+                {% endif %}
+            </td>
+            <td>{{maintenance.impact_count}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <div class="text-muted">
+        None
+    </div>
+{% endif %}

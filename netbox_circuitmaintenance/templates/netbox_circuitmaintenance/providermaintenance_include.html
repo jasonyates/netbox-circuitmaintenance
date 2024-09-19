@@ -4,17 +4,20 @@
 <h5 class="card-header">
     Active / Upcoming Circuit Maintenances
 </h5>
-<div class="card-body">
+
 {% if circuitmaintenance %}
-    <table class="table table-hover">
+<div class="table-responsive">
+    <table class="table table-hover object-list">
+        <thead>
         <tr>
-            <th>Maintenance ID</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th>Circuit ID</th>
-            <th>Impact</th>
+            <th class="orderable">Maintenance ID</th>
+            <th class="orderable">Start</th>
+            <th class="orderable">End</th>
+            <th class="orderable">Status</th>
+            <th class="orderable">Circuit ID</th>
+            <th class="orderable">Impact</th>
         </tr>
+    </thead>
         {% for maintenance in circuitmaintenance %}
         <tr>
             <td>{{maintenance.circuitmaintenance|linkify}}</td>
@@ -26,10 +29,12 @@
         </tr>
         {% endfor %}
     </table>
+</div>
     {% else %}
+    <div class="card-body">
         <div class="text-muted">
             None
         </div>
+    </div>
     {% endif %}
     </div>
-</div>

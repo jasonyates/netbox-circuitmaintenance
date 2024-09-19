@@ -4,15 +4,16 @@
 <h5 class="card-header">
     Active / Upcoming Circuit Maintenances
 </h5>
-<div class="card-body">
 {% if circuitmaintenance %}
     <table class="table table-hover">
         <tr>
+            <thead>
             <th>Maintenance ID</th>
             <th>Start</th>
             <th>End</th>
             <th>Status</th>
             <th>Impact</th>
+        </thead>
         </tr>
         {% for maintenance in circuitmaintenance %}
         <tr>
@@ -25,9 +26,10 @@
         {% endfor %}
     </table>
     {% else %}
+    <div class="card-body">
         <div class="text-muted">
             None
         </div>
+    </div>
     {% endif %}
     </div>
-</div>

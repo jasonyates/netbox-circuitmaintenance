@@ -5,7 +5,7 @@ __email__ = 'me@jasonyates.co.uk'
 __version__ = '0.3.0'
 
 
-from extras.plugins import PluginConfig
+from netbox.plugins import PluginConfig
 
 
 class CircuitMaintenanceConfig(PluginConfig):
@@ -14,6 +14,10 @@ class CircuitMaintenanceConfig(PluginConfig):
     description = 'Manages circuit maintenance events'
     version = __version__
     base_url = 'maintenance'
+
+    def ready(self):
+        super().ready()
+        from . import widgets
 
 
 config = CircuitMaintenanceConfig
