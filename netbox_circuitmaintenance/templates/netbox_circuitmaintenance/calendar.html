@@ -1,0 +1,36 @@
+{% extends 'generic/_base.html' %}
+{% load buttons %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% load perms %}
+{% load helpers %}
+
+{% block title %}Circuit Maintenance Schedule{% endblock %}
+
+{% block controls %}
+  <div class="controls">
+    	<div class="control-group">
+			<a id="btnPrevMonth" class="btn btn-info" href="{{basepath}}?month={{prev_month}}&year={{prev_year}}">
+				<i class="mdi mdi-arrow-left"></i>
+				Previous Month
+			</a>
+            {% if month != this_month or year != this_year%}
+            <a id="btnPrevMonth" class="btn btn-info" href="{{basepath}}?month={{this_month}}&year={{this_year}}">
+				Today
+			</a>
+            {% endif %}
+			<a id="btnNextMonth" class="btn btn-info" href="{{basepath}}?month={{next_month}}&year={{next_year}}">
+				<i class="mdi mdi-arrow-right"></i>
+				Next Month
+			</a>
+    	</div>
+	</div>
+{% endblock controls %}
+
+{% block content %}
+{{ calendar }}
+{% endblock content %}
+
+{% block javascript %}
+  
+{% endblock javascript %}

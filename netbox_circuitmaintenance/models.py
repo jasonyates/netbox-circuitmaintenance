@@ -13,11 +13,11 @@ class CircuitMaintenanceTypeChoices(ChoiceSet):
     CHOICES = [
         ('TENTATIVE', 'Tentative', 'yellow'),
         ('CONFIRMED', 'Confirmed', 'green'),
-        ('CANCELLED', 'Cancelled', 'gray'),
-        ('IN-PROCESS', 'In-Process', 'orange'),
+        ('CANCELLED', 'Cancelled', 'blue'),
+        ('IN-PROCESS', 'In-Progress', 'orange'),
         ('COMPLETED', 'Completed', 'indigo'),
         ('RE-SCHEDULED', 'Rescheduled', 'green'),
-        ('UNKNOWN', 'Unknown', 'gray'),
+        ('UNKNOWN', 'Unknown', 'blue'),
     ]
 
 class CircuitMaintenanceImpactTypeChoices(ChoiceSet):
