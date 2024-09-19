@@ -58,10 +58,9 @@
     <div class="col col-md-12">
       <div class="card">
         <h5 class="card-header">Maintenance Impact</h5>
-        <div class="card-body">
-
             {% if impacts %}
                 <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th>Circuit ID</th>
                         <th>Circuit Type</th>
@@ -72,6 +71,7 @@
                         <th>Impact</th>
                         <th></th>
                     </tr>
+                </thead>
                     {% for impact in impacts %}
                     <tr>
                         <td>{{impact.circuit|linkify}}</td>
@@ -95,9 +95,11 @@
                     {% endfor %}
                 </table>
             {% else %}
+            <div class="card-body">
                 <div class="text-muted">
                     None
                 </div>
+            </div>
             {% endif %}
         </div>
         {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
@@ -111,7 +113,6 @@
             This maintenance is Completed or Cancelled, the maintenance impact can no longer be modified.
           </div>
         {% endif %}
-      </div>
     </div>
   </div>
 
@@ -119,16 +120,16 @@
     <div class="col col-md-12">
       <div class="card">
         <h5 class="card-header">Recieved Maintenance Notifications</h5>
-        <div class="card-body">
-
             {% if notifications %}
                 <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th>Subject</th>
                         <th>From</th>
                         <th>Date Recieved</th>
                         <th></th>
                     </tr>
+                </thead>
                     {% for email in notifications %}
                     <tr>
                         <td>{{email.subject}}</td>
@@ -146,9 +147,11 @@
                     {% endfor %}
                 </table>
             {% else %}
+            <div class="card-body">
                 <div class="text-muted">
                     No maintenance notifications have been recieved for this maintenance event
                 </div>
+            </div>
             {% endif %}
         </div>
         {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
@@ -162,7 +165,6 @@
             This maintenance is Completed or Cancelled, maintenance notifications can no longer be modified.
           </div>
         {% endif %}
-      </div>
     </div>
   </div>
 

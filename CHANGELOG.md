@@ -1,5 +1,13 @@
 # Changelog
 
+
+## 0.4.0 (2024-09-19)
+
+* Adds support for Netbox 4.0 and 4.1
+* Adds widget to show circuit maintenance events
+* Updates styling to match new Netbox style
+
+
 ## 0.3.0 (2023-04-28)
 
 * Fixed support for Netbox 3.5. NOTE: Plugin version 0.3.0+ is only compatible with Netbox 3.5+
