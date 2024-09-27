@@ -122,9 +122,9 @@ class Calendar(calendar.HTMLCalendar):
 
             # Format time of the event
             if self.custom_strftime('SU', event.start) == self.custom_strftime('SU', event.end):
-                event_time = f'{self.custom_strftime('%H:%M', event.start)} - {self.custom_strftime('%H:%M', event.end)}'
+                event_time = f'{self.custom_strftime("%H:%M", event.start)} - {self.custom_strftime("%H:%M", event.end)}'
             else:
-                event_time = f'{self.custom_strftime('SU %H:%M', event.start)} - {self.custom_strftime('SU %H:%M', event.end)}'
+                event_time = f'{self.custom_strftime("SU %H:%M", event.start)} - {self.custom_strftime("SU %H:%M", event.end)}'
             
             # Add the event to the day
             events_html += f'<span class="badge text-bg-{event.get_status_color()}"><a href="{event.get_absolute_url()}">{event_time}<br>{event.name} <br>{event.provider} - {event.status}<br>{event.impact_count} Impacted</a></span>'
