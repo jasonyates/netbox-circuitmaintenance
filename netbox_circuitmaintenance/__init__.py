@@ -2,7 +2,7 @@
 
 __author__ = """Jason Yates"""
 __email__ = 'me@jasonyates.co.uk'
-__version__ = '0.4.0'
+__version__ = '0.4.2'
 
 
 from netbox.plugins import PluginConfig

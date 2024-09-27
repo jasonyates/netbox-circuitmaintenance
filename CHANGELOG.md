@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 (2024-09-29)
+
+* Adding Maintenance calendar widget
+* Fix #26 - f string quote issue with NB 4.1
+
+## 0.4.1 (2024-09-19)
+
+* Adding Maintenance Schedule calendar
+
 
 ## 0.4.0 (2024-09-19)
 
