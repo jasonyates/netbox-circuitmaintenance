@@ -18,7 +18,7 @@ The plugin does not directly provide an automated approach to ingesting provider
 This plugin is only supported on NetBox 3.4 or higher, for exact compatibility information, see the table below.  
 | NetBox Version | Plugin Version |
 |--|--|
-| 4.0+ | 0.4.0 |
+| 4.0+ | 0.4.2 |
 | 3.5 | 0.3.0 |
 | 3.4 | 0.2.2 |
 
