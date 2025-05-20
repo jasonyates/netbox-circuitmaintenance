@@ -1,25 +1,58 @@
 # pyproject.toml
 
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["netbox_circuitmaintenance", "netbox_circuitmaintenance.*"]
 
 [project]
 name = "netbox-circuitmaintenance"
-version = "0.3.0"
+keywords = ['netbox_circuitmaintenance']
+version = "0.5.0"
 description = "Provides the ability to record circuit maintenance, maintenance impact and maintenance notifications in Netbox and link them to Providers and Circuits."
 readme = "README.md"
 authors = [{ name = "Jason Yates", email = "me@jasonyates.co.uk" }]
 license = { file = "LICENSE" }
 
-[project.urls]
-Homepage = "https://github.com/jasonyates/netbox-circuitmaintenance"
+classifiers = [
+    'Development Status :: 2 - Pre-Alpha',
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+]
+
+requires-python = ">=3.8.0"
 
 [project.optional-dependencies]
-dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
+dev = [
+    "black==22.12.0",
+    "bumpver",
+    "isort==5.11.4",
+    "pip-tools",
+    "pytest",
+    "flake8==6.0.0",
+    "twine==4.0.2",
+    "Sphinx==1.8.5",
+    "watchdog==0.9.0",
+    "bump2version==0.5.11",
+]
+
+[project.urls]
+Homepage = "https://github.com/jasonyates/netbox-circuitmaintenance"
+Documentation = "https://jasonyates.github.io/netbox-circuitmaintenance"
+Source = "https://github.com/jasonyates/netbox-circuitmaintenance"
+Tracker = "https://github.com/jasonyates/netbox-circuitmaintenance/issues"
+
 
 [tool.bumpver]
-current_version = "0.3.0"
+current_version = "0.5.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
@@ -27,18 +60,7 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    'current_version = "{version}"',
-]
-"setup.py" = [
-    "{version}",
-    "{pep440_version}",
-]
-"README.md" = [
-    "{version}",
-    "{pep440_version}",
-]
-"netbox_circuitmaintenance/__init__.py" = [
-    "{version}",
-    "{__version__}",
-]
+"pyproject.toml" = ['current_version = "{version}"']
+"setup.py" = ["{version}", "{pep440_version}"]
+"README.md" = ["{version}", "{pep440_version}"]
+"netbox_circuitmaintenance/__init__.py" = ["{version}", "{__version__}"]
