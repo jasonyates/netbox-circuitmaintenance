@@ -46,7 +46,7 @@ To ensure the Netbox Documents plugin is automatically re-installed during futur
 
 ### Enable the Plugin
 
-In the Netbox `configuration.py` configuration file add or update the PLUGINS parameter, adding `netbox_documents`:
+In the Netbox `configuration.py` configuration file add or update the PLUGINS parameter, adding `netbox_circuitmaintenance`:
 
 
 ```python
