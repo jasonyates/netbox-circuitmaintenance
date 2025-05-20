@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
 from ..models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications
-from circuits.api.nested_serializers import NestedProviderSerializer, NestedCircuitSerializer
+from circuits.api.serializers import ProviderSerializer, CircuitSerializer
 
 
 
@@ -11,7 +11,7 @@ class NestedCircuitMaintenanceImpactSerializer(WritableNestedSerializer):
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenanceimpact-detail'
     )
 
-    circuit = NestedCircuitSerializer()
+    circuit = CircuitSerializer(nested=True)
 
     class Meta:
         model = CircuitMaintenanceImpact
@@ -24,7 +24,7 @@ class NestedCircuitMaintenanceSerializer(WritableNestedSerializer):
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail'
     )
 
-    provider = NestedProviderSerializer()
+    provider = ProviderSerializer(nested=True)
 
     class Meta:
         model = CircuitMaintenance
@@ -50,7 +50,7 @@ class CircuitMaintenanceSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail'
     )
 
-    provider = NestedProviderSerializer()
+    provider = ProviderSerializer(nested=True)
     impact = NestedCircuitMaintenanceImpactSerializer(required=False, many=True)
     notification = NestedCircuitMaintenanceNotificationsSerializer(required=False, many=True)
 
@@ -67,7 +67,7 @@ class CircuitMaintenanceImpactSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenanceimpact-detail'
     )
 
-    circuit = NestedCircuitSerializer()
+    circuit = CircuitSerializer(nested=True)
     circuitmaintenance = NestedCircuitMaintenanceSerializer()
 
     class Meta:
