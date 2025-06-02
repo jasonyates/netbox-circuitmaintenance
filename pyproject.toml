@@ -1,25 +1,56 @@
 # pyproject.toml
 
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["netbox_circuitmaintenance", "netbox_circuitmaintenance.*"]
 
 [project]
 name = "netbox-circuitmaintenance"
-version = "0.3.0"
+keywords = ['netbox_circuitmaintenance']
+version = "0.5.0"
 description = "Provides the ability to record circuit maintenance, maintenance impact and maintenance notifications in Netbox and link them to Providers and Circuits."
 readme = "README.md"
 authors = [{ name = "Jason Yates", email = "me@jasonyates.co.uk" }]
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
+
+classifiers = [
+    'Development Status :: 2 - Pre-Alpha',
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+]
+
+requires-python = ">=3.10.0"
+
+[project.optional-dependencies]
+dev = [
+    "black==25.1.0",
+    "bumpver",
+    "isort==6.0.1",
+    "pip-tools",
+    "pytest",
+    "flake8==7.2.0",
+    "pyproject-flake8==7.0.0",
+    "twine==6.1.0",
+    "Sphinx==8.2.3",
+    "watchdog==6.0.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/jasonyates/netbox-circuitmaintenance"
+Documentation = "https://jasonyates.github.io/netbox-circuitmaintenance"
+Source = "https://github.com/jasonyates/netbox-circuitmaintenance"
+Tracker = "https://github.com/jasonyates/netbox-circuitmaintenance/issues"
 
-[project.optional-dependencies]
-dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 [tool.bumpver]
-current_version = "0.3.0"
+current_version = "0.5.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
@@ -27,18 +58,42 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    'current_version = "{version}"',
+"pyproject.toml" = ['current_version = "{version}"']
+"README.md" = ["{version}", "{pep440_version}"]
+"netbox_circuitmaintenance/__init__.py" = ["{version}", "{__version__}"]
+
+[tool.flake8]
+max-line-length = 120
+max-complexity = 18
+extend-ignore = ["E203", "E266", "W503"]
+per-file-ignores = ["__init__.py:F401"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "setup.py",
+    "build",
+    "dist",
+    "docs",
+    "releases",
+    ".venv",
+    ".tox",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".vscode",
+    ".github",
 ]
-"setup.py" = [
-    "{version}",
-    "{pep440_version}",
-]
-"README.md" = [
-    "{version}",
-    "{pep440_version}",
-]
-"netbox_circuitmaintenance/__init__.py" = [
-    "{version}",
-    "{__version__}",
-]
+# By default test codes will be linted.
+# tests
+
+[tool.tox]
+legacy_tox_ini = """
+[tox:tox]
+isolated_build = true
+envlist = py310, py311, py312, format, lint, build
+
+[gh-actions]
+python =
+    3.12: py312
+    3.11: py311
+    3.10: py310, format, lint, build
+"""
