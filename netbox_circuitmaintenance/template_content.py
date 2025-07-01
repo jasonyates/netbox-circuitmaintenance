@@ -26,7 +26,7 @@ class SiteMaintenanceList(PluginTemplateExtension):
     def left_page(self):
 
         return self.render('netbox_circuitmaintenance/providermaintenance_include.html', extra_context={
-            'circuitmaintenance': CircuitMaintenanceImpact.objects.filter(Q(circuit__termination_a__site=self.context['object']) | Q(circuit__termination_z__site=self.context['object']), circuitmaintenance__status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']),
+            'circuitmaintenance': CircuitMaintenanceImpact.objects.filter(Q(circuit__termination_a___site=self.context['object']) | Q(circuit__termination_z___site=self.context['object']), circuitmaintenance__status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']),
         })
 
 
