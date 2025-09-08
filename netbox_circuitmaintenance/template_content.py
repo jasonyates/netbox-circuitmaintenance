@@ -3,7 +3,7 @@ from django.db.models import Q
 from .models import CircuitMaintenanceImpact 
 
 class CircuitMaintenanceList(PluginTemplateExtension):
-    model = 'circuits.circuit'
+    models = ('circuits.circuit', )
 
     def left_page(self):
 
@@ -12,7 +12,7 @@ class CircuitMaintenanceList(PluginTemplateExtension):
         })
 
 class ProviderMaintenanceList(PluginTemplateExtension):
-    model = 'circuits.provider'
+    models = ('circuits.provider', )
 
     def left_page(self):
 
@@ -21,7 +21,7 @@ class ProviderMaintenanceList(PluginTemplateExtension):
         })
 
 class SiteMaintenanceList(PluginTemplateExtension):
-    model = 'dcim.site'
+    models = ('dcim.site', )
 
     def left_page(self):
 
