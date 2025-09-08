@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0 (2025-09-08)
+
+* Netbox 4.4 support
+* Bug fix by @PetrVoronov
+* Highlight current date in calendar event view
+
+## 0.5.0 (2025-06-02)
+
+* Netbox 4.2 support
+
 ## 0.4.2 (2024-09-29)
 
 * Adding Maintenance calendar widget
