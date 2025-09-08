@@ -26,7 +26,7 @@ urlpatterns = (
     path('circuitmaintenance/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='circuitmaintenance_changelog', kwargs={
         'model': models.CircuitMaintenance
     }),
-    path('circuitimpact/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='circuitmaintenance_changelog', kwargs={
+    path('circuitimpact/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='circuitimpact_changelog', kwargs={
         'model': models.CircuitMaintenanceImpact
     }),
 
