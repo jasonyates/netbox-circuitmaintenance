@@ -10,7 +10,8 @@ include = ["netbox_circuitmaintenance", "netbox_circuitmaintenance.*"]
 [project]
 name = "netbox-circuitmaintenance"
 keywords = ['netbox_circuitmaintenance']
-version = "0.5.0"
+# prefixing 100 to main repo version to help distigish my experimental fork
+version = "100.5.0"
 description = "Provides the ability to record circuit maintenance, maintenance impact and maintenance notifications in Netbox and link them to Providers and Circuits."
 readme = "README.md"
 authors = [{ name = "Jason Yates", email = "me@jasonyates.co.uk" }]
@@ -26,7 +27,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
 ]
 
-requires-python = ">=3.10.0"
+requires-python = ">=3.11.0"
 
 [project.optional-dependencies]
 dev = [
@@ -36,7 +37,7 @@ dev = [
     "pip-tools",
     "pytest",
     "flake8==7.2.0",
-    "pyproject-flake8==7.0.0",
+    "pyproject-flake8",
     "twine==6.1.0",
     "Sphinx==8.2.3",
     "watchdog==6.0.0",
@@ -50,7 +51,7 @@ Tracker = "https://github.com/jasonyates/netbox-circuitmaintenance/issues"
 
 
 [tool.bumpver]
-current_version = "0.5.0"
+current_version = "100.5.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
