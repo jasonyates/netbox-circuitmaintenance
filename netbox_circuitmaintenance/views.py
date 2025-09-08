@@ -133,7 +133,13 @@ class Calendar(calendar.HTMLCalendar):
         if day == 0:
             return '<td>&nbsp;</td>'
         else:
-            return '<td class="%s"><strong>%d</strong>%s</td>' % (self.cssclasses[weekday], day, events_html)
+            # Check if this day is today
+            today = datetime.date.today()
+            css_class = self.cssclasses[weekday]
+            if day == today.day and self.month == today.month and self.year == today.year:
+                css_class += " today-highlight"
+            
+            return '<td class="%s"><strong>%d</strong>%s</td>' % (css_class, day, events_html)
  
     def formatweek(self, theweek, events):
         """
@@ -179,7 +185,7 @@ class CircuitMaintenanceScheduleView(View):
             year = curr_month.year
 
         # Load calendar
-        cal = Calendar()
+        cal = Calendar(year, month)
         html_calendar = cal.formatmonth(year, month)
         html_calendar = html_calendar.replace('<td ', '<td  width="300" height="150"')
 
