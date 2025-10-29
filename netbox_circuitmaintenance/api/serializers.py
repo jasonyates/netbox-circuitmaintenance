@@ -29,7 +29,7 @@ class NestedCircuitMaintenanceSerializer(WritableNestedSerializer):
     class Meta:
         model = CircuitMaintenance
         fields = (
-            'id', 'url', 'name', 'status',  'provider', 'start', 'end', 'acknowledged', 'created', 'last_updated',
+            'id', 'url', 'name', 'status',  'provider', 'start', 'end', 'original_timezone', 'acknowledged', 'created', 'last_updated',
         )
 
 class NestedCircuitMaintenanceNotificationsSerializer(WritableNestedSerializer):
@@ -57,7 +57,7 @@ class CircuitMaintenanceSerializer(NetBoxModelSerializer):
     class Meta:
         model = CircuitMaintenance
         fields = (
-            'id', 'url', 'display', 'name', 'summary', 'status', 'provider', 'start', 'end', 'impact', 'internal_ticket', 'acknowledged', 'notification', 'comments', 'tags', 'custom_fields', 'created',
+            'id', 'url', 'display', 'name', 'summary', 'status', 'provider', 'start', 'end', 'original_timezone', 'impact', 'internal_ticket', 'acknowledged', 'notification', 'comments', 'tags', 'custom_fields', 'created',
             'last_updated',
         )
 

@@ -6,7 +6,7 @@ class CircuitMaintenanceFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = CircuitMaintenance
-        fields = ('id', 'name', 'summary', 'status', 'provider', 'start', 'end', 'impact', 'internal_ticket', 'acknowledged', 'comments')
+        fields = ('id', 'name', 'summary', 'status', 'provider', 'start', 'end', 'original_timezone', 'impact', 'internal_ticket', 'acknowledged', 'comments')
 
     def search(self, queryset, name, value):
         if not value.strip():

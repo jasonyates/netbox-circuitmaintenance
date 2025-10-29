@@ -35,8 +35,10 @@ dev = [
     "isort==6.0.1",
     "pip-tools",
     "pytest",
-    "flake8==7.2.0",
-    "pyproject-flake8==7.0.0",
+    "pytest-django>=4.5.0",
+    "pytest-cov>=3.0.0",
+    "flake8>=7.0.0",
+    "pyproject-flake8>=7.0.0",
     "twine==6.1.0",
     "Sphinx==8.2.3",
     "watchdog==6.0.0",
@@ -84,6 +86,13 @@ exclude = [
 ]
 # By default test codes will be linted.
 # tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=netbox_circuitmaintenance --cov-report=term-missing"
 
 [tool.tox]
 legacy_tox_ini = """
