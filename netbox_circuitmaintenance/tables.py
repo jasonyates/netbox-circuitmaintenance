@@ -17,7 +17,9 @@ class CircuitMaintenanceTable(NetBoxTable):
 
     impact_count = tables.Column(verbose_name="Impacted Circuits")
 
-    summary = tables.TemplateColumn('<data-toggle="tooltip" title="{{record.summary}}">{{record.summary|truncatewords:15}}')
+    summary = tables.TemplateColumn(
+        '<span data-bs-toggle="tooltip" title="{{ record.summary }}">{{ record.summary|truncatewords:15 }}</span>'
+    )
 
     class Meta(NetBoxTable.Meta):
         model = CircuitMaintenance

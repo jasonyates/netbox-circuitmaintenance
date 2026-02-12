@@ -82,6 +82,10 @@ class CircuitMaintenance(NetBoxModel):
         blank=True
     )
 
+    clone_fields = (
+        'status', 'provider', 'acknowledged',
+    )
+
     class Meta:
         ordering = ('-created',)
         verbose_name = 'Circuit Maintenance'
@@ -89,6 +93,13 @@ class CircuitMaintenance(NetBoxModel):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        if self.start and self.end and self.end <= self.start:
+            raise ValidationError({
+                'end': 'End date/time must be after start date/time.'
+            })
 
     def get_status_color(self):
         return CircuitMaintenanceTypeChoices.colors.get(self.status)
@@ -122,6 +133,12 @@ class CircuitMaintenanceImpact(NetBoxModel):
         ordering = ('impact',)
         verbose_name = 'Circuit Maintenance Impact'
         verbose_name_plural = 'Circuit Maintenance Impact'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['circuitmaintenance', 'circuit'],
+                name='unique_maintenance_circuit',
+            )
+        ]
 
     def get_impact_color(self):
         return CircuitMaintenanceImpactTypeChoices.colors.get(self.impact)
@@ -162,12 +179,12 @@ class CircuitMaintenanceNotifications(NetBoxModel):
         verbose_name="Email From",
     )
 
-    email_recieved = models.DateTimeField(
-        verbose_name="Email Recieved"
+    email_received = models.DateTimeField(
+        verbose_name="Email Received"
     )
 
     class Meta:
-        ordering = ('email_recieved',)
+        ordering = ('email_received',)
         verbose_name = 'Circuit Maintenance Notification'
         verbose_name_plural = 'Circuit Maintenance Notification'
 
