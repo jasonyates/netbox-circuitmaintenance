@@ -1,0 +1,25 @@
+from typing import List
+
+import strawberry
+import strawberry_django
+
+from .types import (
+    CircuitMaintenanceType,
+    CircuitMaintenanceImpactType,
+    CircuitMaintenanceNotificationType,
+)
+
+
+@strawberry.type(name="Query")
+class CircuitMaintenanceQuery:
+    circuit_maintenance: CircuitMaintenanceType = strawberry_django.field()
+    circuit_maintenance_list: List[CircuitMaintenanceType] = strawberry_django.field()
+
+    circuit_maintenance_impact: CircuitMaintenanceImpactType = strawberry_django.field()
+    circuit_maintenance_impact_list: List[CircuitMaintenanceImpactType] = strawberry_django.field()
+
+    circuit_maintenance_notification: CircuitMaintenanceNotificationType = strawberry_django.field()
+    circuit_maintenance_notification_list: List[CircuitMaintenanceNotificationType] = strawberry_django.field()
+
+
+schema = [CircuitMaintenanceQuery]
