@@ -119,14 +119,14 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Recieved Maintenance Notifications</h5>
+        <h5 class="card-header">Received Maintenance Notifications</h5>
             {% if notifications %}
                 <table class="table table-hover">
                     <thead>
                     <tr>
                         <th>Subject</th>
                         <th>From</th>
-                        <th>Date Recieved</th>
+                        <th>Date Received</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -134,7 +134,7 @@
                     <tr>
                         <td>{{email.subject}}</td>
                         <td>{{email.email_from}}</td>
-                        <td>{{email.email_recieved}}</td>
+                        <td>{{email.email_received}}</td>
                         <td class="text-end noprint">
                             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification" target="_blank">
                                 <i class="mdi mdi-book" aria-hidden="true"></i>
@@ -149,7 +149,7 @@
             {% else %}
             <div class="card-body">
                 <div class="text-muted">
-                    No maintenance notifications have been recieved for this maintenance event
+                    No maintenance notifications have been received for this maintenance event
                 </div>
             </div>
             {% endif %}
