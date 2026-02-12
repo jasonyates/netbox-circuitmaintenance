@@ -44,5 +44,5 @@ class CircuitMaintenanceImpactType(NetBoxObjectType):
         'created', 'last_updated',
     ],
 )
-class CircuitMaintenanceNotificationType(NetBoxObjectType):
+class CircuitMaintenanceNotificationsType(NetBoxObjectType):
     circuitmaintenance: Annotated["CircuitMaintenanceType", strawberry.lazy('netbox_circuitmaintenance.graphql.types')]
