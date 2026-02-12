@@ -1,7 +1,11 @@
 from netbox.api.viewsets import NetBoxModelViewSet
 
 from .. import models, filtersets
-from .serializers import CircuitMaintenanceSerializer, CircuitMaintenanceImpactSerializer, CircuitMaintenanceNotificationsSerializer
+from .serializers import (
+    CircuitMaintenanceSerializer,
+    CircuitMaintenanceImpactSerializer,
+    CircuitMaintenanceNotificationsSerializer,
+)
 
 class CircuitMaintenanceViewSet(NetBoxModelViewSet):
     queryset = models.CircuitMaintenance.objects.prefetch_related('tags')

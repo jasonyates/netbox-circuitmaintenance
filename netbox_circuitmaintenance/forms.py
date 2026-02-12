@@ -40,12 +40,14 @@ class CircuitMaintenanceFilterForm(NetBoxModelFilterSetForm):
         required=False
     )
 
-    start = forms.CharField(
-        required=False
+    start = forms.DateTimeField(
+        required=False,
+        widget=DateTimePicker()
     )
 
-    end = forms.CharField(
-        required=False
+    end = forms.DateTimeField(
+        required=False,
+        widget=DateTimePicker()
     )
 
     acknowledged = forms.BooleanField(
@@ -56,16 +58,18 @@ class CircuitMaintenanceFilterForm(NetBoxModelFilterSetForm):
         required=False
     )
 
-    impact = forms.ModelMultipleChoiceField(
-        queryset=CircuitMaintenanceImpact.objects.all(),
-        required=False
-    )
-
 
 class CircuitMaintenanceImpactForm(NetBoxModelForm):
 
+    circuitmaintenance = DynamicModelChoiceField(
+        queryset=CircuitMaintenance.objects.all(),
+    )
+
     circuit = DynamicModelChoiceField(
-        queryset=Circuit.objects.all()
+        queryset=Circuit.objects.all(),
+        query_params={
+            'provider_id': '$circuitmaintenance__provider',
+        }
     )
 
     class Meta:
@@ -76,7 +80,7 @@ class CircuitMaintenanceNotificationsForm(NetBoxModelForm):
 
     class Meta:
         model = CircuitMaintenanceNotifications
-        fields = ('circuitmaintenance', 'subject', 'email_from', 'email_body', 'email_recieved')
+        fields = ('circuitmaintenance', 'subject', 'email_from', 'email_body', 'email_received')
         widgets = {
-            'email_recieved': DateTimePicker()
+            'email_received': DateTimePicker()
         }
