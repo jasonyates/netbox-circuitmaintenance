@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.7.0
+
+### Breaking Changes
+- API field `email_recieved` renamed to `email_received` (typo fix)
+- API serializers restructured: removed separate nested serializer classes, added `brief_fields`
+
+### Bug Fixes
+- Fixed XSS vulnerability in notification email display (now sanitised with nh3)
+- Fixed DEGRADED impact badge color (`orage` -> `orange`)
+- Fixed calendar year navigation (prev/next were both broken)
+- Fixed calendar not showing events spanning month boundaries
+- Fixed broken search in CircuitMaintenanceImpact filterset
+- Fixed malformed HTML and Bootstrap 5 attributes in summary table column
+- Fixed verbose_name typo (`Imapct` -> `Impact`)
+- Removed invalid `max_length` parameter from DateTimeFields
+- Removed unnecessary `null=True` from `acknowledged` BooleanField
+
+### Enhancements
+- Added `clone_fields` for better clone functionality (#13)
+- Added date range validation (end must be after start)
+- Added unique constraint preventing duplicate circuit/maintenance associations
+- Added SearchIndex for global search support
+- Added GraphQL type definitions (#7)
+- Added ICS/iCal subscription feed (#14)
+- Added historical maintenance tab on Circuit, Provider, and Site pages (#3)
+- Added responsive CSS for calendar views
+- Added htmx-powered calendar month navigation (no page reload)
+- Added "View Full Calendar" link on dashboard widget
+- Circuit dropdown in impact form now filtered by maintenance provider (#12)
+- Filter form date fields now use DateTimePicker widgets
+- Expanded search to include summary, provider name, and internal ticket
+- Centralised active status constants (DRY)
+
+### Dependencies
+- Added `nh3>=0.2.14` (HTML sanitisation)
+- Added `icalendar>=5.0.0` (ICS feed generation)
+
 ## 0.6.0 (2025-09-08)
 
 * Netbox 4.4 support

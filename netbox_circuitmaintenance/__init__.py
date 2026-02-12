@@ -2,7 +2,7 @@
 
 __author__ = """Jason Yates"""
 __email__ = 'me@jasonyates.co.uk'
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 
 
 from netbox.plugins import PluginConfig
@@ -14,6 +14,7 @@ class CircuitMaintenanceConfig(PluginConfig):
     description = 'Manages circuit maintenance events'
     version = __version__
     base_url = 'maintenance'
+    graphql_schema = 'graphql.schema.schema'
 
     def ready(self):
         super().ready()

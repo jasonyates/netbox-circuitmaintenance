@@ -31,13 +31,13 @@ class MaintenanceCalendarWidget(DashboardWidget):
     description = 'Show a simplified calendar view showing upcoming maintenance events this month'
     template_name = 'netbox_circuitmaintenance/calendar_widget.html'
     width = 8
-    height = 8
+    height = 5
 
     def render(self, request):
 
         curr_month = datetime.date.today()
 
         # Load calendar
-        cal = Calendar()
+        cal = Calendar(curr_month.year, curr_month.month)
         html_calendar = cal.formatmonth(curr_month.year, curr_month.month)
         return render_to_string(self.template_name, {"calendar":  mark_safe(html_calendar)})
