@@ -6,7 +6,7 @@ from django.urls import reverse
 
 class CircuitMaintenanceTypeChoices(ChoiceSet):
 
-    # Valid maintenance staus choices. From BCOP standard - https://github.com/jda/maintnote-std/blob/master/standard.md
+    # Valid maintenance status choices. From BCOP standard - https://github.com/jda/maintnote-std/blob/master/standard.md
 
     key = 'DocTypeChoices.CircuitMaintenance'
 
@@ -22,14 +22,14 @@ class CircuitMaintenanceTypeChoices(ChoiceSet):
 
 class CircuitMaintenanceImpactTypeChoices(ChoiceSet):
 
-    # Valid maintenance staus choices. From BCOP standard - https://github.com/jda/maintnote-std/blob/master/standard.md
+    # Valid maintenance status choices. From BCOP standard - https://github.com/jda/maintnote-std/blob/master/standard.md
 
     key = 'DocTypeChoices.CircuitMaintenanceImpact'
 
     CHOICES = [
         ('NO-IMPACT', 'No-Impact', 'green'),
         ('REDUCED-REDUNDANCY', 'Reduced Redundancy', 'yellow'),
-        ('DEGRADED', 'Degraded', 'orage'),
+        ('DEGRADED', 'Degraded', 'orange'),
         ('OUTAGE', 'Outage', 'red'),
     ]
 
@@ -58,12 +58,10 @@ class CircuitMaintenance(NetBoxModel):
     )
 
     start = models.DateTimeField(
-        max_length=100,
         help_text='Start date and time of the maintenance event e.g. 2022-12-25 14:30'
     )
 
     end = models.DateTimeField(
-        max_length=100,
         help_text='End date and time of the maintenance event e.g. 2022-12-26 14:30'
     )
 
@@ -75,9 +73,7 @@ class CircuitMaintenance(NetBoxModel):
     )
 
     acknowledged = models.BooleanField(
-        default=False, 
-        null=True, 
-        blank=True,
+        default=False,
         verbose_name="Acknowledged?",
         help_text="Confirm if this maintenance event has been acknowledged"
     )
@@ -125,7 +121,7 @@ class CircuitMaintenanceImpact(NetBoxModel):
     class Meta:
         ordering = ('impact',)
         verbose_name = 'Circuit Maintenance Impact'
-        verbose_name_plural = 'Circuit Maintenance Imapct'
+        verbose_name_plural = 'Circuit Maintenance Impact'
 
     def get_impact_color(self):
         return CircuitMaintenanceImpactTypeChoices.colors.get(self.impact)
