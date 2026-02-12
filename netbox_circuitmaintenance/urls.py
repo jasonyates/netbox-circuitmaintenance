@@ -2,6 +2,7 @@ from django.urls import path
 
 from netbox.views.generic import ObjectChangeLogView
 from . import models, views
+from .ical import MaintenanceICalView
 
 
 urlpatterns = (
@@ -32,5 +33,6 @@ urlpatterns = (
 
     path('maintenanceschedule/', views.CircuitMaintenanceScheduleView.as_view(), name='maintenanceschedule'),
 
+    path('maintenance.ics', MaintenanceICalView.as_view(), name='maintenance_ics'),
 
 )
