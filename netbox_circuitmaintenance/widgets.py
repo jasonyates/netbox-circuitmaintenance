@@ -31,7 +31,7 @@ class MaintenanceCalendarWidget(DashboardWidget):
     description = 'Show a simplified calendar view showing upcoming maintenance events this month'
     template_name = 'netbox_circuitmaintenance/calendar_widget.html'
     width = 8
-    height = 5
+    height = 6
 
     def render(self, request):
 
