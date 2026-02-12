@@ -9,7 +9,7 @@ import datetime
 import calendar
 from django.utils.safestring import mark_safe
 from django.db.models import Q
-from django.conf import settings
+from django.urls import reverse
 
 # Circuit Maintenance Views
 class CircuitMaintenanceView(generic.ObjectView):
@@ -96,63 +96,153 @@ class Calendar(calendar.HTMLCalendar):
         
     def prev_year(self, month, year):
         if month == 1:
-            return year-1
-        elif month == 12:
-            return year+1
-        else:
-            return year
+            return year - 1
+        return year
 
     def next_year(self, month, year):
-        if month == 1:
-            return year-1
-        elif month == 12:
-            return year+1
-        else:
-            return year
+        if month == 12:
+            return year + 1
+        return year
 
-    def formatday(self, day, weekday, events):
+    def formatday(self, day, weekday, events, week_dates):
         """
-        Return a day as a table cell.
+        Return a day as a table cell with single-day events as badges
+        and multi-day events as continuous bar segments.
         """
-        events_from_day = events.filter(Q(start__day=day) | Q(end__day=day))
-        events_html = "<ul>"
-        for event in events_from_day:
-            if events_html != '<ul>':
-                events_html += '<br><br>'
-
-            # Format time of the event
-            if self.custom_strftime('SU', event.start) == self.custom_strftime('SU', event.end):
-                event_time = f'{self.custom_strftime("%H:%M", event.start)} - {self.custom_strftime("%H:%M", event.end)}'
-            else:
-                event_time = f'{self.custom_strftime("SU %H:%M", event.start)} - {self.custom_strftime("SU %H:%M", event.end)}'
-            
-            # Add the event to the day
-            events_html += f'<span class="badge text-bg-{event.get_status_color()}"><a href="{event.get_absolute_url()}">{event_time}<br>{event.name} <br>{event.provider} - {event.status}<br>{event.impact_count} Impacted</a></span>'
-        events_html += "</ul>"
- 
         if day == 0:
             return '<td>&nbsp;</td>'
-        else:
-            # Check if this day is today
-            today = datetime.date.today()
-            css_class = self.cssclasses[weekday]
-            if day == today.day and self.month == today.month and self.year == today.year:
-                css_class += " today-highlight"
-            
-            return '<td class="%s"><strong>%d</strong>%s</td>' % (css_class, day, events_html)
- 
+
+        this_date = datetime.date(self.year, self.month, day)
+
+        # Multi-day event bar segments
+        multi_day_html = ""
+        multi_day_events = [
+            e for e in events
+            if e.start.date() != e.end.date()
+            and e.start.date() <= this_date
+            and e.end.date() >= this_date
+        ]
+        for event in multi_day_events:
+            is_actual_start = event.start.date() == this_date
+            is_week_start = this_date == week_dates[0]
+            is_first_cell = is_actual_start or (is_week_start and event.start.date() < week_dates[0])
+
+            # On continuation days, add a spacer so single-day events sit below the bar
+            if not is_first_cell:
+                multi_day_html += '<div class="cal-span-spacer"></div>'
+                continue
+
+            # Calculate how many days the bar spans within this week
+            event_end_in_week = min(event.end.date(), week_dates[-1])
+            span_days = (event_end_in_week - this_date).days + 1
+
+            # Rounded corners
+            starts_here = is_actual_start
+            ends_here = event.end.date() <= week_dates[-1]
+            if starts_here and ends_here:
+                radius_cls = "rounded"
+            elif starts_here:
+                radius_cls = "rounded-start"
+            elif ends_here:
+                radius_cls = "rounded-end"
+            else:
+                radius_cls = ""
+
+            event_time = (
+                f'{self.custom_strftime("SU %H:%M", event.start)} - '
+                f'{self.custom_strftime("SU %H:%M", event.end)}'
+            )
+            tooltip = (
+                f'{event_time} | {event.name} | '
+                f'{event.provider} - {event.status} | '
+                f'{event.impact_count} Impacted'
+            )
+
+            # Show text only on the actual event start date
+            label = tooltip if is_actual_start else '&nbsp;'
+
+            # Width spans across N columns (each column is 14.285% of table)
+            width_style = f'width: calc({span_days} * 100% + {span_days - 1} * 8px);' if span_days > 1 else ''
+
+            multi_day_html += (
+                f'<a href="{event.get_absolute_url()}" '
+                f'class="cal-span text-bg-{event.get_status_color()} {radius_cls}" '
+                f'style="{width_style}" '
+                f'title="{tooltip}">'
+                f'{label}</a>'
+            )
+
+        # Single-day events
+        single_html = ""
+        single_day_events = [
+            e for e in events
+            if e.start.date() == e.end.date() and e.start.date() == this_date
+        ]
+        for event in single_day_events:
+            event_time = f'{event.start.strftime("%H:%M")} - {event.end.strftime("%H:%M")}'
+            single_html += (
+                f'<span class="badge text-bg-{event.get_status_color()} d-block mb-1">'
+                f'<a href="{event.get_absolute_url()}">'
+                f'{event_time}<br>{event.name}<br>'
+                f'{event.provider} - {event.status}<br>'
+                f'{event.impact_count} Impacted</a></span>'
+            )
+
+        today = datetime.date.today()
+        css_class = self.cssclasses[weekday]
+        if this_date == today:
+            css_class += " today-highlight"
+
+        add_url = reverse('plugins:netbox_circuitmaintenance:circuitmaintenance_add')
+        date_str = this_date.strftime('%Y-%m-%d 09:00')
+        day_link = (
+            f'<a href="{add_url}?start={date_str}" class="cal-day-add" '
+            f'title="Add maintenance on {this_date.strftime("%d %b %Y")}">'
+            f'<strong>{day}</strong> '
+            f'<i class="mdi mdi-plus-circle-outline cal-add-icon"></i></a>'
+        )
+
+        cell_url = f'{add_url}?start={date_str}'
+
+        return (
+            f'<td class="{css_class}" data-href="{cell_url}">'
+            f'{day_link}'
+            f'{multi_day_html}'
+            f'{single_html}'
+            f'</td>'
+        )
+
     def formatweek(self, theweek, events):
         """
         Return a complete week as a table row.
         """
-        week = ''.join(self.formatday(d, wd, events) for (d, wd) in theweek)
-        return '<tr>%s</tr>' % week
+        # Build list of actual dates for this week (for start/end detection)
+        week_dates = []
+        for day, wd in theweek:
+            if day == 0:
+                week_dates.append(None)
+            else:
+                week_dates.append(datetime.date(self.year, self.month, day))
+        valid_dates = [d for d in week_dates if d is not None]
+
+        week = ''.join(
+            self.formatday(d, wd, events, valid_dates)
+            for (d, wd) in theweek
+        )
+        return f'<tr>{week}</tr>'
     
     def formatmonth(self, theyear, themonth):
-        events = models.CircuitMaintenance.objects.filter(Q(start__month=themonth) | Q(end__month=themonth)).annotate(impact_count=Count('impact'))
+        import calendar as cal_module
+        _, last_day = cal_module.monthrange(theyear, themonth)
+        month_start = datetime.date(theyear, themonth, 1)
+        month_end = datetime.date(theyear, themonth, last_day)
+        events = models.CircuitMaintenance.objects.filter(
+            start__date__lte=month_end,
+            end__date__gte=month_start,
+        ).annotate(impact_count=Count('impact'))
         v = []
         a = v.append
-        a('<table class="table">')
+        a('<table class="table table-bordered">')
         a('\n')
         a(self.formatmonthname(theyear, themonth))
         a('\n')
@@ -166,42 +256,36 @@ class Calendar(calendar.HTMLCalendar):
         return ''.join(v)
 
 
-# CircuitMaintenanceSchedule 
-class CircuitMaintenanceScheduleView(View):
+# CircuitMaintenanceSchedule
+class CircuitMaintenanceScheduleView(PermissionRequiredMixin, View):
+    permission_required = 'netbox_circuitmaintenance.view_circuitmaintenance'
     template_name = 'netbox_circuitmaintenance/calendar.html'
-
+    partial_template_name = 'netbox_circuitmaintenance/calendar_partial.html'
 
     def get(self, request):
-
         curr_month = datetime.date.today()
 
-        # Check if we have a month and year in the URL
-        if request.GET and 'month' in request.GET:
+        if request.GET.get('month'):
             month = int(request.GET["month"])
             year = int(request.GET["year"])
-
         else:
             month = curr_month.month
             year = curr_month.year
 
-        # Load calendar
         cal = Calendar(year, month)
         html_calendar = cal.formatmonth(year, month)
-        html_calendar = html_calendar.replace('<td ', '<td  width="300" height="150"')
 
-        return render(
-            request,
-            self.template_name,
-            {
-                "calendar":  mark_safe(html_calendar),
-                "this_month": curr_month.month,
-                "this_year": curr_month.year,
-                "month": month,
-                "year": year,
-                "next_month": cal.next_month(month),
-                "next_year": cal.next_year(month, year),
-                "prev_month": cal.prev_month(month),
-                "prev_year": cal.prev_year(month, year),
-                "basepath": settings.BASE_PATH,
-            }
-        )
+        context = {
+            "calendar": mark_safe(html_calendar),
+            "this_month": curr_month.month,
+            "this_year": curr_month.year,
+            "month": month,
+            "year": year,
+            "next_month": cal.next_month(month),
+            "next_year": cal.next_year(month, year),
+            "prev_month": cal.prev_month(month),
+            "prev_year": cal.prev_year(month, year),
+        }
+
+        template = self.partial_template_name if request.headers.get('HX-Request') else self.template_name
+        return render(request, template, context)
