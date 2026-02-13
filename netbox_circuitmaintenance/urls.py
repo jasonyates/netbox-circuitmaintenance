@@ -10,6 +10,8 @@ urlpatterns = (
     path('circuitmaintenance/', views.CircuitMaintenanceListView.as_view(), name='circuitmaintenance_list'),
     path('circuitmaintenance/', views.CircuitMaintenanceListView.as_view(), name='circuitmaintenancenotifications_list'),
 
+    path('circuitmaintenance/edit/', views.CircuitMaintenanceBulkEditView.as_view(), name='circuitmaintenance_bulk_edit'),
+    path('circuitmaintenance/delete/', views.CircuitMaintenanceBulkDeleteView.as_view(), name='circuitmaintenance_bulk_delete'),
     path('circuitmaintenance/add/', views.CircuitMaintenanceEditView.as_view(), name='circuitmaintenance_add'),
     path('circuitimpact/add/', views.CircuitMaintenanceImpactEditView.as_view(), name='circuitimpact_add'),
     path('circuitnotification/add/', views.CircuitMaintenanceNotificationsEditView.as_view(), name='circuitnotification_add'),

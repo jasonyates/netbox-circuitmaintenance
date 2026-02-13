@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 @register_widget
 class UpcomingMaintenanceWidget(DashboardWidget):
     default_title = 'Upcoming Circuit Maintenance Events'
-    description = 'Show a list of upcoming circuit maintenance events'
+    description = 'Active / Upcoming Maintenance'
     template_name = 'netbox_circuitmaintenance/widget.html'
     width = 8
     height = 3

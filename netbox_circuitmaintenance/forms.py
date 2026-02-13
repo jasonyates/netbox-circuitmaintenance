@@ -1,5 +1,5 @@
 from django import forms
-from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm
+from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.widgets import DateTimePicker
 from circuits.models import Provider, Circuit
@@ -57,6 +57,20 @@ class CircuitMaintenanceFilterForm(NetBoxModelFilterSetForm):
     internal_ticket = forms.CharField(
         required=False
     )
+
+
+class CircuitMaintenanceBulkEditForm(NetBoxModelBulkEditForm):
+    model = CircuitMaintenance
+
+    status = forms.ChoiceField(
+        choices=CircuitMaintenanceTypeChoices,
+        required=False,
+    )
+    acknowledged = forms.NullBooleanField(
+        required=False,
+    )
+
+    nullable_fields = ()
 
 
 class CircuitMaintenanceImpactForm(NetBoxModelForm):

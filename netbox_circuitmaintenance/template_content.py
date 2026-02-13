@@ -3,18 +3,17 @@ from django.db.models import Q
 from .models import CircuitMaintenanceImpact
 from .constants import ACTIVE_STATUSES
 
-TERMINAL_STATUSES = ('COMPLETED', 'CANCELLED')
-
 
 class CircuitMaintenanceList(PluginTemplateExtension):
     models = ('circuits.circuit',)
 
     def left_page(self):
         circuit = self.context['object']
-        base_qs = CircuitMaintenanceImpact.objects.filter(circuit=circuit)
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            circuit=circuit, circuitmaintenance__status__in=ACTIVE_STATUSES
+        )
         return self.render('netbox_circuitmaintenance/maintenance_tabs_include.html', extra_context={
-            'active_maintenance': base_qs.filter(circuitmaintenance__status__in=ACTIVE_STATUSES),
-            'historical_maintenance': base_qs.filter(circuitmaintenance__status__in=TERMINAL_STATUSES).order_by('-circuitmaintenance__end')[:20],
+            'active_maintenance': active_qs,
         })
 
 
@@ -23,10 +22,11 @@ class ProviderMaintenanceList(PluginTemplateExtension):
 
     def left_page(self):
         provider = self.context['object']
-        base_qs = CircuitMaintenanceImpact.objects.filter(circuitmaintenance__provider=provider)
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            circuitmaintenance__provider=provider, circuitmaintenance__status__in=ACTIVE_STATUSES
+        )
         return self.render('netbox_circuitmaintenance/maintenance_tabs_include.html', extra_context={
-            'active_maintenance': base_qs.filter(circuitmaintenance__status__in=ACTIVE_STATUSES),
-            'historical_maintenance': base_qs.filter(circuitmaintenance__status__in=TERMINAL_STATUSES).order_by('-circuitmaintenance__end')[:20],
+            'active_maintenance': active_qs,
         })
 
 
@@ -36,10 +36,11 @@ class SiteMaintenanceList(PluginTemplateExtension):
     def left_page(self):
         site = self.context['object']
         site_q = Q(circuit__termination_a___site=site) | Q(circuit__termination_z___site=site)
-        base_qs = CircuitMaintenanceImpact.objects.filter(site_q)
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            site_q, circuitmaintenance__status__in=ACTIVE_STATUSES
+        )
         return self.render('netbox_circuitmaintenance/maintenance_tabs_include.html', extra_context={
-            'active_maintenance': base_qs.filter(circuitmaintenance__status__in=ACTIVE_STATUSES),
-            'historical_maintenance': base_qs.filter(circuitmaintenance__status__in=TERMINAL_STATUSES).order_by('-circuitmaintenance__end')[:20],
+            'active_maintenance': active_qs,
         })
 
 

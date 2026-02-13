@@ -1,15 +1,20 @@
 
 from netbox.views import generic
-from django.db.models import Count
+from django.db.models import Count, Q
 from . import forms, models, tables, filtersets
+from .models import CircuitMaintenanceImpact
 from django.views.generic import View
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render
 import datetime
 import calendar
 from django.utils.safestring import mark_safe
-from django.db.models import Q
 from django.urls import reverse
+from utilities.views import register_model_view, ViewTab
+from circuits.models import Circuit, Provider
+from dcim.models import Site
+
+TERMINAL_STATUSES = ('COMPLETED', 'CANCELLED')
 
 # Circuit Maintenance Views
 class CircuitMaintenanceView(generic.ObjectView):
@@ -41,6 +46,17 @@ class CircuitMaintenanceEditView(generic.ObjectEditView):
 
 class CircuitMaintenanceDeleteView(generic.ObjectDeleteView):
     queryset = models.CircuitMaintenance.objects.all()
+
+class CircuitMaintenanceBulkEditView(generic.BulkEditView):
+    queryset = models.CircuitMaintenance.objects.all()
+    filterset = filtersets.CircuitMaintenanceFilterSet
+    table = tables.CircuitMaintenanceTable
+    form = forms.CircuitMaintenanceBulkEditForm
+
+class CircuitMaintenanceBulkDeleteView(generic.BulkDeleteView):
+    queryset = models.CircuitMaintenance.objects.all()
+    filterset = filtersets.CircuitMaintenanceFilterSet
+    table = tables.CircuitMaintenanceTable
 
 
 # Circuit Maintenance Impact views
@@ -289,3 +305,70 @@ class CircuitMaintenanceScheduleView(PermissionRequiredMixin, View):
 
         template = self.partial_template_name if request.headers.get('HX-Request') else self.template_name
         return render(request, template, context)
+
+
+# Historical Maintenance tab views for Circuit, Provider, and Site detail pages
+
+@register_model_view(Circuit, 'historical-maintenance')
+class CircuitHistoricalMaintenanceTabView(generic.ObjectChildrenView):
+    queryset = Circuit.objects.all()
+    child_model = CircuitMaintenanceImpact
+    table = tables.CircuitMaintenanceImpactTable
+    filterset = filtersets.CircuitMaintenanceImpactFilterSet
+    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    tab = ViewTab(
+        label='Historical Maintenance',
+        hide_if_empty=False,
+        badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
+            circuit=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
+        ).count(),
+    )
+
+    def get_children(self, request, parent):
+        return self.child_model.objects.restrict(request.user, 'view').filter(
+            circuit=parent, circuitmaintenance__status__in=TERMINAL_STATUSES
+        ).order_by('-circuitmaintenance__end')
+
+
+@register_model_view(Provider, 'historical-maintenance')
+class ProviderHistoricalMaintenanceTabView(generic.ObjectChildrenView):
+    queryset = Provider.objects.all()
+    child_model = CircuitMaintenanceImpact
+    table = tables.CircuitMaintenanceImpactWithCircuitTable
+    filterset = filtersets.CircuitMaintenanceImpactFilterSet
+    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    tab = ViewTab(
+        label='Historical Maintenance',
+        hide_if_empty=False,
+        badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
+            circuitmaintenance__provider=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
+        ).count(),
+    )
+
+    def get_children(self, request, parent):
+        return self.child_model.objects.restrict(request.user, 'view').filter(
+            circuitmaintenance__provider=parent, circuitmaintenance__status__in=TERMINAL_STATUSES
+        ).order_by('-circuitmaintenance__end')
+
+
+@register_model_view(Site, 'historical-maintenance')
+class SiteHistoricalMaintenanceTabView(generic.ObjectChildrenView):
+    queryset = Site.objects.all()
+    child_model = CircuitMaintenanceImpact
+    table = tables.CircuitMaintenanceImpactWithCircuitTable
+    filterset = filtersets.CircuitMaintenanceImpactFilterSet
+    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    tab = ViewTab(
+        label='Historical Maintenance',
+        hide_if_empty=False,
+        badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
+            Q(circuit__termination_a___site=obj) | Q(circuit__termination_z___site=obj),
+            circuitmaintenance__status__in=TERMINAL_STATUSES,
+        ).count(),
+    )
+
+    def get_children(self, request, parent):
+        return self.child_model.objects.restrict(request.user, 'view').filter(
+            Q(circuit__termination_a___site=parent) | Q(circuit__termination_z___site=parent),
+            circuitmaintenance__status__in=TERMINAL_STATUSES,
+        ).order_by('-circuitmaintenance__end')

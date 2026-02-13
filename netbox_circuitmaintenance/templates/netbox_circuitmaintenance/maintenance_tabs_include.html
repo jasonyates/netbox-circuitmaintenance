@@ -1,87 +1,35 @@
 {% load helpers %}
 
 <div class="card">
-    <h5 class="card-header">Circuit Maintenance</h5>
+    <h5 class="card-header">Active / Upcoming Maintenance</h5>
     <div class="card-body p-0">
-        <ul class="nav nav-tabs px-3 pt-2" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#active-maintenance" type="button" role="tab">
-                    Active / Upcoming
-                    {% if active_maintenance %}
-                        <span class="badge text-bg-warning ms-1">{{ active_maintenance|length }}</span>
-                    {% endif %}
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#historical-maintenance" type="button" role="tab">
-                    Historical
-                    {% if historical_maintenance %}
-                        <span class="badge text-bg-secondary ms-1">{{ historical_maintenance|length }}</span>
-                    {% endif %}
-                </button>
-            </li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="active-maintenance" role="tabpanel">
-                {% if active_maintenance %}
-                <div class="table-responsive">
-                    <table class="table table-hover object-list mb-0">
-                        <thead>
-                        <tr>
-                            <th>Maintenance ID</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Status</th>
-                            <th>Impact</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for maintenance in active_maintenance %}
-                        <tr>
-                            <td>{{ maintenance.circuitmaintenance|linkify }}</td>
-                            <td>{{ maintenance.circuitmaintenance.start }}</td>
-                            <td>{{ maintenance.circuitmaintenance.end }}</td>
-                            <td>{% badge maintenance.circuitmaintenance.get_status_display bg_color=maintenance.circuitmaintenance.get_status_color %}</td>
-                            <td>{% badge maintenance.get_impact_display bg_color=maintenance.get_impact_color %}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-muted p-3">None</div>
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" id="historical-maintenance" role="tabpanel">
-                {% if historical_maintenance %}
-                <div class="table-responsive">
-                    <table class="table table-hover object-list mb-0">
-                        <thead>
-                        <tr>
-                            <th>Maintenance ID</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Status</th>
-                            <th>Impact</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for maintenance in historical_maintenance %}
-                        <tr>
-                            <td>{{ maintenance.circuitmaintenance|linkify }}</td>
-                            <td>{{ maintenance.circuitmaintenance.start }}</td>
-                            <td>{{ maintenance.circuitmaintenance.end }}</td>
-                            <td>{% badge maintenance.circuitmaintenance.get_status_display bg_color=maintenance.circuitmaintenance.get_status_color %}</td>
-                            <td>{% badge maintenance.get_impact_display bg_color=maintenance.get_impact_color %}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-muted p-3">None</div>
-                {% endif %}
-            </div>
+        {% if active_maintenance %}
+        <div class="table-responsive">
+            <table class="table table-hover object-list mb-0">
+                <thead>
+                <tr>
+                    <th>Maintenance ID</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Impact</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for maintenance in active_maintenance %}
+                <tr>
+                    <td>{{ maintenance.circuitmaintenance|linkify }}</td>
+                    <td>{{ maintenance.circuitmaintenance.start }}</td>
+                    <td>{{ maintenance.circuitmaintenance.end }}</td>
+                    <td>{% badge maintenance.circuitmaintenance.get_status_display bg_color=maintenance.circuitmaintenance.get_status_color %}</td>
+                    <td>{% badge maintenance.get_impact_display bg_color=maintenance.get_impact_color %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <div class="text-muted p-3">None</div>
+        {% endif %}
     </div>
 </div>
