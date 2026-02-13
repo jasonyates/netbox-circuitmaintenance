@@ -8,6 +8,7 @@ from .ical import MaintenanceICalView
 urlpatterns = (
 
     path('circuitmaintenance/', views.CircuitMaintenanceListView.as_view(), name='circuitmaintenance_list'),
+    path('circuitmaintenance/', views.CircuitMaintenanceListView.as_view(), name='circuitmaintenancenotifications_list'),
 
     path('circuitmaintenance/add/', views.CircuitMaintenanceEditView.as_view(), name='circuitmaintenance_add'),
     path('circuitimpact/add/', views.CircuitMaintenanceImpactEditView.as_view(), name='circuitimpact_add'),
