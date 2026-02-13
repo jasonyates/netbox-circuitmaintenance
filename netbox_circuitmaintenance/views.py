@@ -318,7 +318,7 @@ class CircuitHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
     tab = ViewTab(
         label='Historical Maintenance',
-        hide_if_empty=False,
+        hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
             circuit=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
         ).count(),
@@ -339,7 +339,7 @@ class ProviderHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
     tab = ViewTab(
         label='Historical Maintenance',
-        hide_if_empty=False,
+        hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
             circuitmaintenance__provider=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
         ).count(),
@@ -360,7 +360,7 @@ class SiteHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
     tab = ViewTab(
         label='Historical Maintenance',
-        hide_if_empty=False,
+        hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
             Q(circuit__termination_a___site=obj) | Q(circuit__termination_z___site=obj),
             circuitmaintenance__status__in=TERMINAL_STATUSES,
