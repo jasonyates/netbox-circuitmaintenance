@@ -1,91 +1,108 @@
+from circuits.api.serializers import CircuitSerializer, ProviderSerializer
+from netbox.api.serializers import NetBoxModelSerializer
 from rest_framework import serializers
+from timezone_field.rest_framework import TimeZoneSerializerField
 
-from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
-from ..models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications
-from circuits.api.serializers import ProviderSerializer, CircuitSerializer
-
-
-
-class NestedCircuitMaintenanceImpactSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenanceimpact-detail'
-    )
-
-    circuit = CircuitSerializer(nested=True)
-
-    class Meta:
-        model = CircuitMaintenanceImpact
-        fields = (
-            'id', 'url', 'circuit', 'impact', 'created', 'last_updated',
-        )
-
-class NestedCircuitMaintenanceSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail'
-    )
-
-    provider = ProviderSerializer(nested=True)
-
-    class Meta:
-        model = CircuitMaintenance
-        fields = (
-            'id', 'url', 'name', 'status',  'provider', 'start', 'end', 'acknowledged', 'created', 'last_updated',
-        )
-
-class NestedCircuitMaintenanceNotificationsSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenancenotifications-detail'
-    )
-
-    class Meta:
-        model = CircuitMaintenanceNotifications
-        fields = (
-            'id', 'url', 'subject', 'email_from', 'email_recieved', 'created', 'last_updated',
-        )
+from ..models import (
+    CircuitMaintenance,
+    CircuitMaintenanceImpact,
+    CircuitMaintenanceNotifications,
+)
 
 
 class CircuitMaintenanceSerializer(NetBoxModelSerializer):
-
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail'
+        view_name="plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail"
     )
-
     provider = ProviderSerializer(nested=True)
-    impact = NestedCircuitMaintenanceImpactSerializer(required=False, many=True)
-    notification = NestedCircuitMaintenanceNotificationsSerializer(required=False, many=True)
+    time_zone = TimeZoneSerializerField(required=False)
 
     class Meta:
         model = CircuitMaintenance
         fields = (
-            'id', 'url', 'display', 'name', 'summary', 'status', 'provider', 'start', 'end', 'impact', 'internal_ticket', 'acknowledged', 'notification', 'comments', 'tags', 'custom_fields', 'created',
-            'last_updated',
+            "id",
+            "url",
+            "display",
+            "name",
+            "summary",
+            "status",
+            "provider",
+            "start",
+            "end",
+            "time_zone",
+            "internal_ticket",
+            "acknowledged",
+            "comments",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        )
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "name",
+            "status",
+            "provider",
+            "start",
+            "end",
         )
 
+
 class CircuitMaintenanceImpactSerializer(NetBoxModelSerializer):
-
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenanceimpact-detail'
+        view_name="plugins-api:netbox_circuitmaintenance-api:circuitmaintenanceimpact-detail"
     )
-
     circuit = CircuitSerializer(nested=True)
-    circuitmaintenance = NestedCircuitMaintenanceSerializer()
+    circuitmaintenance = CircuitMaintenanceSerializer(nested=True)
 
     class Meta:
         model = CircuitMaintenanceImpact
         fields = (
-            'id', 'url', 'circuitmaintenance', 'circuit', 'impact', 'custom_fields', 'created', 'last_updated',
+            "id",
+            "url",
+            "display",
+            "circuitmaintenance",
+            "circuit",
+            "impact",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
         )
+        brief_fields = ("id", "url", "display", "circuit", "impact")
+
 
 class CircuitMaintenanceNotificationsSerializer(NetBoxModelSerializer):
-
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenancenotifications-detail'
+        view_name="plugins-api:netbox_circuitmaintenance-api:circuitmaintenancenotifications-detail"
     )
-
-    circuitmaintenance = NestedCircuitMaintenanceSerializer()
+    circuitmaintenance = CircuitMaintenanceSerializer(
+        nested=True, required=False, allow_null=True
+    )
 
     class Meta:
         model = CircuitMaintenanceNotifications
         fields = (
-            'id', 'url', 'circuitmaintenance', 'email_body', 'subject', 'email_from', 'email_recieved', 'created', 'last_updated',
+            "id",
+            "url",
+            "display",
+            "circuitmaintenance",
+            "email_body",
+            "subject",
+            "email_from",
+            "email_received",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        )
+        brief_fields = (
+            "id",
+            "url",
+            "display",
+            "subject",
+            "email_from",
+            "email_received",
         )

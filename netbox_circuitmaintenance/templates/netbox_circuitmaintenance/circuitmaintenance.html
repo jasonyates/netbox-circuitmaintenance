@@ -29,11 +29,15 @@
               </tr>
               <tr>
                 <th scope="row">Start Date/Time</th>
-                <td>{{ object.start }}</td>
+                <td>{{ object.start }}{% if object.time_zone %} <small class="text-muted">({{ object.time_zone }})</small>{% endif %}</td>
               </tr>
               <tr>
                 <th scope="row">End Date/Time</th>
-                <td>{{ object.end }}</td>
+                <td>{{ object.end }}{% if object.time_zone %} <small class="text-muted">({{ object.time_zone }})</small>{% endif %}</td>
+              </tr>
+              <tr>
+                <th scope="row">Provider Timezone</th>
+                <td>{{ object.time_zone }}</td>
               </tr>
               <tr>
                 <th scope="row">Internal Ticket #</th>
@@ -82,7 +86,7 @@
                         <td>{{impact.circuit.termination_z|linkify|placeholder }}</td>
                         <td>{% badge impact.get_impact_display bg_color=impact.get_impact_color %}</td>
                         <td class="text-end noprint">
-                            {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+                            {% if not is_terminal %}
                               <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_edit' pk=impact.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-warning btn-sm lh-1" title="Edit Impact">
                                 <i class="mdi mdi-pencil" aria-hidden="true"></i>
                               </a>
@@ -102,7 +106,7 @@
             </div>
             {% endif %}
         </div>
-        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        {% if not is_terminal %}
         <div class="card-footer text-end noprint">
             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Associate a Circuit Impact
@@ -119,14 +123,14 @@
   <div class="row mb-3">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Recieved Maintenance Notifications</h5>
+        <h5 class="card-header">Received Maintenance Notifications</h5>
             {% if notifications %}
                 <table class="table table-hover">
                     <thead>
                     <tr>
                         <th>Subject</th>
                         <th>From</th>
-                        <th>Date Recieved</th>
+                        <th>Date Received</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -134,12 +138,12 @@
                     <tr>
                         <td>{{email.subject}}</td>
                         <td>{{email.email_from}}</td>
-                        <td>{{email.email_recieved}}</td>
+                        <td>{{email.email_received}}</td>
                         <td class="text-end noprint">
                             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification" target="_blank">
                                 <i class="mdi mdi-book" aria-hidden="true"></i>
                               </a>
-                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">
+                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">
                                 <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i>
                               </a>
                           </td>
@@ -149,14 +153,14 @@
             {% else %}
             <div class="card-body">
                 <div class="text-muted">
-                    No maintenance notifications have been recieved for this maintenance event
+                    No maintenance notifications have been received for this maintenance event
                 </div>
             </div>
             {% endif %}
         </div>
-        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        {% if not is_terminal %}
         <div class="card-footer text-end noprint">
-            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
+            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Maintenance Notification
             </a>
           </div>

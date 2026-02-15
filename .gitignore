@@ -106,3 +106,7 @@ venv.bak/
 
 # MacOS FS
 .DS_Store
+
+# Claude
+docs/plans/
+.claude/

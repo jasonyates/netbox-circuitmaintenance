@@ -1,19 +1,26 @@
 from netbox.api.viewsets import NetBoxModelViewSet
 
-from .. import models, filtersets
-from .serializers import CircuitMaintenanceSerializer, CircuitMaintenanceImpactSerializer, CircuitMaintenanceNotificationsSerializer
+from .. import filtersets, models
+from .serializers import (
+    CircuitMaintenanceImpactSerializer,
+    CircuitMaintenanceNotificationsSerializer,
+    CircuitMaintenanceSerializer,
+)
+
 
 class CircuitMaintenanceViewSet(NetBoxModelViewSet):
-    queryset = models.CircuitMaintenance.objects.prefetch_related('tags')
+    queryset = models.CircuitMaintenance.objects.prefetch_related("tags")
     serializer_class = CircuitMaintenanceSerializer
     filterset_class = filtersets.CircuitMaintenanceFilterSet
 
+
 class CircuitMaintenanceImpactViewSet(NetBoxModelViewSet):
-    queryset = models.CircuitMaintenanceImpact.objects.prefetch_related('tags')
+    queryset = models.CircuitMaintenanceImpact.objects.prefetch_related("tags")
     serializer_class = CircuitMaintenanceImpactSerializer
     filterset_class = filtersets.CircuitMaintenanceImpactFilterSet
 
+
 class CircuitMaintenanceNotificationsViewSet(NetBoxModelViewSet):
-    queryset = models.CircuitMaintenanceNotifications.objects.prefetch_related('tags')
+    queryset = models.CircuitMaintenanceNotifications.objects.prefetch_related("tags")
     serializer_class = CircuitMaintenanceNotificationsSerializer
     filterset_class = filtersets.CircuitMaintenanceNotificationsFilterSet

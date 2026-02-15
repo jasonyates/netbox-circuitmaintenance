@@ -1,19 +1,23 @@
 """Top-level package for Netbox Circuit Maintenance Plugin."""
 
 __author__ = """Jason Yates"""
-__email__ = 'me@jasonyates.co.uk'
-__version__ = '0.6.0'
+__email__ = "me@jasonyates.co.uk"
+__version__ = "0.8.0"
 
 
 from netbox.plugins import PluginConfig
 
 
 class CircuitMaintenanceConfig(PluginConfig):
-    name = 'netbox_circuitmaintenance'
-    verbose_name = 'Netbox Circuit Maintenance Plugin'
-    description = 'Manages circuit maintenance events'
+    name = "netbox_circuitmaintenance"
+    verbose_name = "Netbox Circuit Maintenance Plugin"
+    description = "Manages circuit maintenance events"
     version = __version__
-    base_url = 'maintenance'
+    author = __author__
+    author_email = __email__
+    base_url = "maintenance"
+    min_version = "4.4"
+    graphql_schema = "graphql.schema.schema"
 
     def ready(self):
         super().ready()

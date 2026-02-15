@@ -1,33 +1,64 @@
-from netbox.plugins import PluginTemplateExtension
 from django.db.models import Q
-from .models import CircuitMaintenanceImpact 
+from netbox.plugins import PluginTemplateExtension
+
+from .constants import ACTIVE_STATUSES
+from .models import CircuitMaintenanceImpact
+
 
 class CircuitMaintenanceList(PluginTemplateExtension):
-    models = ('circuits.circuit', )
+    models = ("circuits.circuit",)
 
     def left_page(self):
+        circuit = self.context["object"]
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            circuit=circuit, circuitmaintenance__status__in=ACTIVE_STATUSES
+        ).select_related("circuitmaintenance", "circuit")
+        return self.render(
+            "netbox_circuitmaintenance/maintenance_tabs_include.html",
+            extra_context={
+                "active_maintenance": active_qs,
+            },
+        )
 
-        return self.render('netbox_circuitmaintenance/circuitmaintenance_include.html', extra_context={
-            'circuitmaintenance': CircuitMaintenanceImpact.objects.filter(circuit__cid=self.context['object'].cid, circuitmaintenance__status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']),
-        })
 
 class ProviderMaintenanceList(PluginTemplateExtension):
-    models = ('circuits.provider', )
+    models = ("circuits.provider",)
 
     def left_page(self):
+        provider = self.context["object"]
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            circuitmaintenance__provider=provider,
+            circuitmaintenance__status__in=ACTIVE_STATUSES,
+        ).select_related("circuitmaintenance", "circuit")
+        return self.render(
+            "netbox_circuitmaintenance/maintenance_tabs_include.html",
+            extra_context={
+                "active_maintenance": active_qs,
+            },
+        )
 
-        return self.render('netbox_circuitmaintenance/providermaintenance_include.html', extra_context={
-            'circuitmaintenance': CircuitMaintenanceImpact.objects.filter(circuitmaintenance__provider=self.context['object'], circuitmaintenance__status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']),
-        })
 
 class SiteMaintenanceList(PluginTemplateExtension):
-    models = ('dcim.site', )
+    models = ("dcim.site",)
 
     def left_page(self):
+        site = self.context["object"]
+        site_q = Q(circuit__termination_a___site=site) | Q(
+            circuit__termination_z___site=site
+        )
+        active_qs = CircuitMaintenanceImpact.objects.filter(
+            site_q, circuitmaintenance__status__in=ACTIVE_STATUSES
+        ).select_related("circuitmaintenance", "circuit")
+        return self.render(
+            "netbox_circuitmaintenance/maintenance_tabs_include.html",
+            extra_context={
+                "active_maintenance": active_qs,
+            },
+        )
 
-        return self.render('netbox_circuitmaintenance/providermaintenance_include.html', extra_context={
-            'circuitmaintenance': CircuitMaintenanceImpact.objects.filter(Q(circuit__termination_a___site=self.context['object']) | Q(circuit__termination_z___site=self.context['object']), circuitmaintenance__status__in=['TENTATIVE', 'CONFIRMED', 'IN-PROCESS', 'RE-SCHEDULED', 'UNKNOWN']),
-        })
 
-
-template_extensions = [CircuitMaintenanceList, ProviderMaintenanceList, SiteMaintenanceList]
+template_extensions = [
+    CircuitMaintenanceList,
+    ProviderMaintenanceList,
+    SiteMaintenanceList,
+]

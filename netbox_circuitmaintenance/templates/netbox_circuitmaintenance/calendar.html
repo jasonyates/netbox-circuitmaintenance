@@ -1,43 +1,160 @@
 {% extends 'generic/_base.html' %}
 {% load buttons %}
-{% load render_table from django_tables2 %}
 {% load static %}
-{% load perms %}
 {% load helpers %}
 
-{% block title %}Circuit Maintenance Schedule{% endblock %}
+{% block title %}Maintenance Calendar{% endblock %}
 
 {% block controls %}
   <div class="controls">
-    	<div class="control-group">
-			<a id="btnPrevMonth" class="btn btn-info" href="{{basepath}}?month={{prev_month}}&year={{prev_year}}">
-				<i class="mdi mdi-arrow-left"></i>
-				Previous Month
-			</a>
-            {% if month != this_month or year != this_year%}
-            <a id="btnPrevMonth" class="btn btn-info" href="{{basepath}}?month={{this_month}}&year={{this_year}}">
-				Today
-			</a>
-            {% endif %}
-			<a id="btnNextMonth" class="btn btn-info" href="{{basepath}}?month={{next_month}}&year={{next_year}}">
-				<i class="mdi mdi-arrow-right"></i>
-				Next Month
-			</a>
-    	</div>
-	</div>
+    <div class="control-group">
+        <a class="btn btn-outline-secondary"
+           hx-get="{% url 'plugins:netbox_circuitmaintenance:maintenanceschedule' %}?month={{ prev_month }}&year={{ prev_year }}"
+           hx-target="#calendar-container"
+           hx-swap="innerHTML"
+           hx-push-url="true">
+            <i class="mdi mdi-arrow-left"></i> Previous Month
+        </a>
+        {% if month != this_month or year != this_year %}
+        <a class="btn btn-outline-secondary"
+           hx-get="{% url 'plugins:netbox_circuitmaintenance:maintenanceschedule' %}?month={{ this_month }}&year={{ this_year }}"
+           hx-target="#calendar-container"
+           hx-swap="innerHTML"
+           hx-push-url="true">
+            Today
+        </a>
+        {% endif %}
+        <a class="btn btn-outline-secondary"
+           hx-get="{% url 'plugins:netbox_circuitmaintenance:maintenanceschedule' %}?month={{ next_month }}&year={{ next_year }}"
+           hx-target="#calendar-container"
+           hx-swap="innerHTML"
+           hx-push-url="true">
+            Next Month <i class="mdi mdi-arrow-right"></i>
+        </a>
+        <a class="btn btn-outline-success" href="{% url 'plugins:netbox_circuitmaintenance:maintenance_ics' %}" title="Subscribe to ICS feed">
+            <i class="mdi mdi-calendar-export"></i> Subscribe (ICS)
+        </a>
+    </div>
+  </div>
 {% endblock controls %}
 
 {% block content %}
 <style>
+.table {
+    table-layout: fixed;
+    width: 100%;
+}
+.table th, .table td {
+    width: 14.285%;
+}
+.table td {
+    height: 150px;
+    vertical-align: top;
+    padding: 4px 8px;
+    overflow: visible;
+    position: relative;
+}
+.table td ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.table td .badge {
+    display: inline-block;
+    margin-bottom: 4px;
+    white-space: normal;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+}
+.cal-span + .badge,
+.cal-span-spacer + .badge {
+    margin-top: 6px;
+}
+.table td .badge a {
+    color: inherit;
+    text-decoration: none;
+}
+/* Multi-day spanning bars inside day cells */
+.cal-span-spacer {
+    height: 1.6em;
+    margin: 2px 0;
+}
+.cal-span {
+    display: block;
+    padding: 3px 6px;
+    margin: 2px 0;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    text-decoration: none;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+    border-radius: 4px;
+}
+.cal-span:hover {
+    text-decoration: none;
+    color: #fff;
+}
+.table td .badge a:hover {
+    text-decoration: none;
+}
+/* Click-to-add day link */
+.cal-day-add {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    margin-bottom: 2px;
+}
+.cal-day-add:hover {
+    text-decoration: none;
+    color: inherit;
+}
+.cal-add-icon {
+    opacity: 0;
+    font-size: 0.85rem;
+    color: var(--bs-success);
+    transition: opacity 0.15s;
+}
+.table td:hover .cal-add-icon {
+    opacity: 1;
+}
+.table td:hover {
+    cursor: pointer;
+    background-color: rgba(var(--bs-success-rgb), 0.04);
+}
 .today-highlight {
     background-color: #dee2e6 !important;
     border: 1px solid #dee2e6 !important;
     border-radius: 4px;
 }
+@media (max-width: 992px) {
+    .table td {
+        height: auto;
+        font-size: 0.85rem;
+    }
+    .cal-span { font-size: 0.7rem; }
+}
+@media (max-width: 576px) {
+    .table td {
+        padding: 2px 4px;
+    }
+    .table td .badge {
+        font-size: 0.7rem;
+    }
+    .cal-span { font-size: 0.65rem; padding: 2px 4px; }
+}
 </style>
-{{ calendar }}
+<div id="calendar-container">
+{% include 'netbox_circuitmaintenance/calendar_partial.html' %}
+</div>
+<script>
+document.addEventListener('click', function(e) {
+    var td = e.target.closest('td[data-href]');
+    if (!td) return;
+    // Don't navigate if clicking on an event link or badge
+    if (e.target.closest('a.cal-span, .badge a')) return;
+    window.location.href = td.getAttribute('data-href');
+});
+</script>
 {% endblock content %}
-
-{% block javascript %}
-  
-{% endblock javascript %}
