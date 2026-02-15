@@ -1,4 +1,4 @@
-sources = Netbox Circuit Maintenance Plugin
+sources = netbox_circuitmaintenance
 
 .PHONY: test format lint unittest pre-commit clean
 test: format lint unittest

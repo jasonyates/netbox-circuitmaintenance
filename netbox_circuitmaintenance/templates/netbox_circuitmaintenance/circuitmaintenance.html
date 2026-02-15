@@ -86,7 +86,7 @@
                         <td>{{impact.circuit.termination_z|linkify|placeholder }}</td>
                         <td>{% badge impact.get_impact_display bg_color=impact.get_impact_color %}</td>
                         <td class="text-end noprint">
-                            {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+                            {% if not is_terminal %}
                               <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_edit' pk=impact.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-warning btn-sm lh-1" title="Edit Impact">
                                 <i class="mdi mdi-pencil" aria-hidden="true"></i>
                               </a>
@@ -106,7 +106,7 @@
             </div>
             {% endif %}
         </div>
-        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        {% if not is_terminal %}
         <div class="card-footer text-end noprint">
             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitimpact_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Associate a Circuit Impact
@@ -158,7 +158,7 @@
             </div>
             {% endif %}
         </div>
-        {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
+        {% if not is_terminal %}
         <div class="card-footer text-end noprint">
             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Maintenance Notification

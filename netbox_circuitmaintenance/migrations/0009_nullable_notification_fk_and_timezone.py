@@ -1,7 +1,6 @@
 import django.db.models.deletion
-from django.db import migrations, models
-
 import timezone_field
+from django.db import migrations, models
 
 
 def set_default_timezone(apps, schema_editor):

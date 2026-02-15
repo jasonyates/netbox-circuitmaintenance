@@ -7,10 +7,10 @@ from .models import CircuitMaintenance, CircuitMaintenanceNotifications
 class CircuitMaintenanceIndex(SearchIndex):
     model = CircuitMaintenance
     fields = (
-        ('name', 100),
-        ('summary', 500),
-        ('internal_ticket', 1000),
-        ('comments', 5000),
+        ("name", 100),
+        ("summary", 500),
+        ("internal_ticket", 1000),
+        ("comments", 5000),
     )
 
 
@@ -18,6 +18,6 @@ class CircuitMaintenanceIndex(SearchIndex):
 class CircuitMaintenanceNotificationsIndex(SearchIndex):
     model = CircuitMaintenanceNotifications
     fields = (
-        ('subject', 100),
-        ('email_from', 1000),
+        ("subject", 100),
+        ("email_from", 1000),
     )

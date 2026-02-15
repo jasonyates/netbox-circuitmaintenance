@@ -1,55 +1,61 @@
-
+import calendar
+import datetime
 from collections import OrderedDict
 
-from netbox.views import generic
-from django.db.models import Count, Q
-from . import forms, models, tables, filtersets
-from .constants import ACTIVE_STATUSES
-from .models import CircuitMaintenanceImpact
-from django.views.generic import View
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import render
-import datetime
-import calendar
-from django.utils import timezone as django_timezone
-from django.utils.safestring import mark_safe
-from django.urls import reverse
-from utilities.views import register_model_view, ViewTab
 from circuits.models import Circuit, Provider
 from dcim.models import Site
+from django.db.models import Count, Q
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import timezone as django_timezone
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+from django.views.generic import View
+from netbox.views import generic
+from utilities.views import ObjectPermissionRequiredMixin, ViewTab, register_model_view
 
-TERMINAL_STATUSES = ('COMPLETED', 'CANCELLED')
+from . import filtersets, forms, models, tables
+from .constants import ACTIVE_STATUSES, TERMINAL_STATUSES
+from .models import CircuitMaintenanceImpact
+
 
 # Circuit Maintenance Views
 class CircuitMaintenanceView(generic.ObjectView):
-    queryset = models.CircuitMaintenance.objects.prefetch_related('impact').all()
+    queryset = models.CircuitMaintenance.objects.prefetch_related("impact").all()
 
     def get_extra_context(self, request, instance):
         # Load the maintenance event impact
-        impact = models.CircuitMaintenanceImpact.objects.filter(circuitmaintenance=instance)
+        impact = models.CircuitMaintenanceImpact.objects.filter(
+            circuitmaintenance=instance
+        ).select_related("circuit")
 
         # Load the maintenance event notifications
-        notification = models.CircuitMaintenanceNotifications.objects.filter(circuitmaintenance=instance)
+        notification = models.CircuitMaintenanceNotifications.objects.filter(
+            circuitmaintenance=instance
+        )
 
         return {
             "impacts": impact,
-            "notifications": notification
+            "notifications": notification,
+            "is_terminal": instance.status in TERMINAL_STATUSES,
         }
 
+
 class CircuitMaintenanceListView(generic.ObjectListView):
-    queryset = models.CircuitMaintenance.objects.annotate(
-        impact_count=Count('impact')
-    )
+    queryset = models.CircuitMaintenance.objects.annotate(impact_count=Count("impact"))
     table = tables.CircuitMaintenanceTable
     filterset = filtersets.CircuitMaintenanceFilterSet
     filterset_form = forms.CircuitMaintenanceFilterForm
+
 
 class CircuitMaintenanceEditView(generic.ObjectEditView):
     queryset = models.CircuitMaintenance.objects.all()
     form = forms.CircuitMaintenanceForm
 
+
 class CircuitMaintenanceDeleteView(generic.ObjectDeleteView):
     queryset = models.CircuitMaintenance.objects.all()
+
 
 class CircuitMaintenanceBulkEditView(generic.BulkEditView):
     queryset = models.CircuitMaintenance.objects.all()
@@ -57,16 +63,23 @@ class CircuitMaintenanceBulkEditView(generic.BulkEditView):
     table = tables.CircuitMaintenanceTable
     form = forms.CircuitMaintenanceBulkEditForm
 
+
 class CircuitMaintenanceBulkDeleteView(generic.BulkDeleteView):
     queryset = models.CircuitMaintenance.objects.all()
     filterset = filtersets.CircuitMaintenanceFilterSet
     table = tables.CircuitMaintenanceTable
 
 
+class CircuitMaintenanceBulkImportView(generic.BulkImportView):
+    queryset = models.CircuitMaintenance.objects.all()
+    model_form = forms.CircuitMaintenanceImportForm
+
+
 # Circuit Maintenance Impact views
 class CircuitMaintenanceImpactEditView(generic.ObjectEditView):
     queryset = models.CircuitMaintenanceImpact.objects.all()
     form = forms.CircuitMaintenanceImpactForm
+
 
 class CircuitMaintenanceImpactDeleteView(generic.ObjectDeleteView):
     queryset = models.CircuitMaintenanceImpact.objects.all()
@@ -77,8 +90,10 @@ class CircuitMaintenanceNotificationsEditView(generic.ObjectEditView):
     queryset = models.CircuitMaintenanceNotifications.objects.all()
     form = forms.CircuitMaintenanceNotificationsForm
 
+
 class CircuitMaintenanceNotificationsDeleteView(generic.ObjectDeleteView):
     queryset = models.CircuitMaintenanceNotifications.objects.all()
+
 
 class CircuitMaintenanceNotificationView(generic.ObjectView):
     queryset = models.CircuitMaintenanceNotifications.objects.all()
@@ -91,12 +106,15 @@ class CircuitMaintenanceNotificationsListView(generic.ObjectListView):
     table = tables.CircuitMaintenanceNotificationsTable
     filterset = filtersets.CircuitMaintenanceNotificationsFilterSet
     filterset_form = forms.CircuitMaintenanceNotificationsFilterForm
-    template_name = 'netbox_circuitmaintenance/unmatched_notifications_list.html'
+    template_name = "netbox_circuitmaintenance/unmatched_notifications_list.html"
 
 
-class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):
-    permission_required = 'netbox_circuitmaintenance.view_circuitmaintenance'
-    template_name = 'netbox_circuitmaintenance/maintenance_summary.html'
+class CircuitMaintenanceSummaryView(ObjectPermissionRequiredMixin, View):
+    queryset = models.CircuitMaintenance.objects.all()
+    template_name = "netbox_circuitmaintenance/maintenance_summary.html"
+
+    def get_required_permission(self):
+        return "netbox_circuitmaintenance.view_circuitmaintenance"
 
     def get(self, request):
         now = django_timezone.now()
@@ -106,44 +124,50 @@ class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):
         week_start = today - datetime.timedelta(days=today.weekday())
         week_end = week_start + datetime.timedelta(days=6)
 
-        # Stats
-        in_progress = models.CircuitMaintenance.objects.filter(status='IN-PROCESS').count()
-        confirmed_this_week = models.CircuitMaintenance.objects.filter(
-            status='CONFIRMED',
+        # Stats — use restricted queryset
+        qs = self.queryset.restrict(request.user, "view")
+
+        in_progress = qs.filter(status="IN-PROCESS").count()
+        confirmed_this_week = qs.filter(
+            status="CONFIRMED",
             start__date__gte=week_start,
             start__date__lte=week_end,
         ).count()
-        upcoming_7 = models.CircuitMaintenance.objects.filter(
+        upcoming_7 = qs.filter(
             status__in=ACTIVE_STATUSES,
             start__date__gte=today,
             start__date__lte=today + datetime.timedelta(days=7),
         ).count()
-        upcoming_30 = models.CircuitMaintenance.objects.filter(
+        upcoming_30 = qs.filter(
             status__in=ACTIVE_STATUSES,
             start__date__gte=today,
             start__date__lte=today + datetime.timedelta(days=30),
         ).count()
-        unacknowledged = models.CircuitMaintenance.objects.filter(
+        unacknowledged = qs.filter(
             status__in=ACTIVE_STATUSES,
             acknowledged=False,
         ).count()
 
         # Timeline: active maintenance in next 14 days
-        timeline = models.CircuitMaintenance.objects.filter(
-            status__in=ACTIVE_STATUSES,
-            start__date__lte=today + datetime.timedelta(days=14),
-            end__date__gte=today,
-        ).annotate(
-            impact_count=Count('impact')
-        ).order_by('start')
+        timeline = (
+            qs.filter(
+                status__in=ACTIVE_STATUSES,
+                start__date__lte=today + datetime.timedelta(days=14),
+                end__date__gte=today,
+            )
+            .annotate(impact_count=Count("impact"))
+            .order_by("start")
+        )
 
         # Upcoming by provider
-        upcoming_maintenance = models.CircuitMaintenance.objects.filter(
-            status__in=ACTIVE_STATUSES,
-            start__date__gte=today,
-        ).annotate(
-            impact_count=Count('impact')
-        ).order_by('provider__name', 'start')
+        upcoming_maintenance = (
+            qs.filter(
+                status__in=ACTIVE_STATUSES,
+                start__date__gte=today,
+            )
+            .annotate(impact_count=Count("impact"))
+            .order_by("provider__name", "start")
+        )
 
         grouped_by_provider = OrderedDict()
         for maint in upcoming_maintenance:
@@ -153,8 +177,8 @@ class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):
         # Build filter URLs for clickable stat cards
         # NetBox uses MultiValueCharFilter (BaseInFilter) which expects
         # comma-separated values: ?status=VAL1,VAL2
-        list_url = reverse('plugins:netbox_circuitmaintenance:circuitmaintenance_list')
-        active_status_csv = ','.join(ACTIVE_STATUSES)
+        list_url = reverse("plugins:netbox_circuitmaintenance:circuitmaintenance_list")
+        active_status_csv = ",".join(ACTIVE_STATUSES)
         today_str = today.isoformat()
         week_start_str = week_start.isoformat()
         week_end_str = week_end.isoformat()
@@ -162,64 +186,64 @@ class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):
         day30_str = (today + datetime.timedelta(days=30)).isoformat()
 
         context = {
-            'in_progress': in_progress,
-            'confirmed_this_week': confirmed_this_week,
-            'upcoming_7': upcoming_7,
-            'upcoming_30': upcoming_30,
-            'unacknowledged': unacknowledged,
-            'timeline': timeline,
-            'grouped_by_provider': grouped_by_provider,
-            'in_progress_url': f'{list_url}?status=IN-PROCESS',
-            'confirmed_this_week_url': (
-                f'{list_url}?status=CONFIRMED'
-                f'&start_after={week_start_str}&start_before={week_end_str}'
+            "in_progress": in_progress,
+            "confirmed_this_week": confirmed_this_week,
+            "upcoming_7": upcoming_7,
+            "upcoming_30": upcoming_30,
+            "unacknowledged": unacknowledged,
+            "timeline": timeline,
+            "grouped_by_provider": grouped_by_provider,
+            "in_progress_url": f"{list_url}?status=IN-PROCESS",
+            "confirmed_this_week_url": (
+                f"{list_url}?status=CONFIRMED"
+                f"&start_after={week_start_str}&start_before={week_end_str}"
             ),
-            'upcoming_7_url': (
-                f'{list_url}?status={active_status_csv}'
-                f'&start_after={today_str}&start_before={day7_str}'
+            "upcoming_7_url": (
+                f"{list_url}?status={active_status_csv}"
+                f"&start_after={today_str}&start_before={day7_str}"
             ),
-            'upcoming_30_url': (
-                f'{list_url}?status={active_status_csv}'
-                f'&start_after={today_str}&start_before={day30_str}'
+            "upcoming_30_url": (
+                f"{list_url}?status={active_status_csv}"
+                f"&start_after={today_str}&start_before={day30_str}"
             ),
-            'unacknowledged_url': (
-                f'{list_url}?status={active_status_csv}&acknowledged=false'
+            "unacknowledged_url": (
+                f"{list_url}?status={active_status_csv}&acknowledged=false"
             ),
         }
 
         return render(request, self.template_name, context)
 
 
-class Calendar(calendar.HTMLCalendar):
+class MaintenanceCalendar(calendar.HTMLCalendar):
     def __init__(self, year=None, month=None):
         self.year = year
         self.month = month
-        super(Calendar, self).__init__()
+        super(MaintenanceCalendar, self).__init__()
 
     def suffix(self, day):
         if 4 <= day <= 20 or 24 <= day <= 30:
             return "th"
         else:
             return ["st", "nd", "rd"][day % 10 - 1]
-    
-    def custom_strftime(self, format, t):
-        return t.strftime(format).replace('SU', str(t.day) + self.suffix(t.day))
 
-    def formatmonthname(self, theyear, themonth) :
+    def custom_strftime(self, format, t):
+        return t.strftime(format).replace("SU", str(t.day) + self.suffix(t.day))
+
+    def formatmonthname(self, theyear, themonth):
         return f"<h1>{calendar.month_name[themonth]} {theyear}</h1>"
 
-    def prev_month(self,month):
+    def prev_month(self, month):
         if month == 1:
             return 12
         else:
-            return month-1
-        
+            return month - 1
+
     def next_month(self, month):
         if month == 12:
             return 1
         else:
-            return month+1
-        
+            return month + 1
+
     def prev_year(self, month, year):
         if month == 1:
             return year - 1
@@ -236,14 +260,15 @@ class Calendar(calendar.HTMLCalendar):
         and multi-day events as continuous bar segments.
         """
         if day == 0:
-            return '<td>&nbsp;</td>'
+            return "<td>&nbsp;</td>"
 
         this_date = datetime.date(self.year, self.month, day)
 
         # Multi-day event bar segments
         multi_day_html = ""
         multi_day_events = [
-            e for e in events
+            e
+            for e in events
             if e.start.date() != e.end.date()
             and e.start.date() <= this_date
             and e.end.date() >= this_date
@@ -251,7 +276,9 @@ class Calendar(calendar.HTMLCalendar):
         for event in multi_day_events:
             is_actual_start = event.start.date() == this_date
             is_week_start = this_date == week_dates[0]
-            is_first_cell = is_actual_start or (is_week_start and event.start.date() < week_dates[0])
+            is_first_cell = is_actual_start or (
+                is_week_start and event.start.date() < week_dates[0]
+            )
 
             # On continuation days, add a spacer so single-day events sit below the bar
             if not is_first_cell:
@@ -279,63 +306,70 @@ class Calendar(calendar.HTMLCalendar):
                 f'{self.custom_strftime("SU %H:%M", event.end)}'
             )
             tooltip = (
-                f'{event_time} | {event.name} | '
-                f'{event.provider} - {event.status} | '
-                f'{event.impact_count} Impacted'
+                f"{event_time} | {escape(event.name)} | "
+                f"{escape(str(event.provider))} - {escape(event.status)} | "
+                f"{event.impact_count} Impacted"
             )
 
             # Show text only on the actual event start date
-            label = tooltip if is_actual_start else '&nbsp;'
+            label = tooltip if is_actual_start else "&nbsp;"
 
             # Width spans across N columns (each column is 14.285% of table)
-            width_style = f'width: calc({span_days} * 100% + {span_days - 1} * 8px);' if span_days > 1 else ''
+            width_style = (
+                f"width: calc({span_days} * 100% + {span_days - 1} * 8px);"
+                if span_days > 1
+                else ""
+            )
 
             multi_day_html += (
                 f'<a href="{event.get_absolute_url()}" '
                 f'class="cal-span text-bg-{event.get_status_color()} {radius_cls}" '
                 f'style="{width_style}" '
                 f'title="{tooltip}">'
-                f'{label}</a>'
+                f"{label}</a>"
             )
 
         # Single-day events
         single_html = ""
         single_day_events = [
-            e for e in events
+            e
+            for e in events
             if e.start.date() == e.end.date() and e.start.date() == this_date
         ]
         for event in single_day_events:
-            event_time = f'{event.start.strftime("%H:%M")} - {event.end.strftime("%H:%M")}'
+            event_time = (
+                f'{event.start.strftime("%H:%M")} - {event.end.strftime("%H:%M")}'
+            )
             single_html += (
                 f'<span class="badge text-bg-{event.get_status_color()} d-block mb-1">'
                 f'<a href="{event.get_absolute_url()}">'
-                f'{event_time}<br>{event.name}<br>'
-                f'{event.provider} - {event.status}<br>'
-                f'{event.impact_count} Impacted</a></span>'
+                f"{event_time}<br>{escape(event.name)}<br>"
+                f"{escape(str(event.provider))} - {escape(event.status)}<br>"
+                f"{event.impact_count} Impacted</a></span>"
             )
 
-        today = datetime.date.today()
+        today = django_timezone.now().date()
         css_class = self.cssclasses[weekday]
         if this_date == today:
             css_class += " today-highlight"
 
-        add_url = reverse('plugins:netbox_circuitmaintenance:circuitmaintenance_add')
-        date_str = this_date.strftime('%Y-%m-%d 09:00')
+        add_url = reverse("plugins:netbox_circuitmaintenance:circuitmaintenance_add")
+        date_str = this_date.strftime("%Y-%m-%d 09:00")
         day_link = (
             f'<a href="{add_url}?start={date_str}" class="cal-day-add" '
             f'title="Add maintenance on {this_date.strftime("%d %b %Y")}">'
-            f'<strong>{day}</strong> '
+            f"<strong>{day}</strong> "
             f'<i class="mdi mdi-plus-circle-outline cal-add-icon"></i></a>'
         )
 
-        cell_url = f'{add_url}?start={date_str}'
+        cell_url = f"{add_url}?start={date_str}"
 
         return (
             f'<td class="{css_class}" data-href="{cell_url}">'
-            f'{day_link}'
-            f'{multi_day_html}'
-            f'{single_html}'
-            f'</td>'
+            f"{day_link}"
+            f"{multi_day_html}"
+            f"{single_html}"
+            f"</td>"
         )
 
     def formatweek(self, theweek, events):
@@ -351,54 +385,57 @@ class Calendar(calendar.HTMLCalendar):
                 week_dates.append(datetime.date(self.year, self.month, day))
         valid_dates = [d for d in week_dates if d is not None]
 
-        week = ''.join(
-            self.formatday(d, wd, events, valid_dates)
-            for (d, wd) in theweek
+        week = "".join(
+            self.formatday(d, wd, events, valid_dates) for (d, wd) in theweek
         )
-        return f'<tr>{week}</tr>'
-    
+        return f"<tr>{week}</tr>"
+
     def formatmonth(self, theyear, themonth):
         import calendar as cal_module
+
         _, last_day = cal_module.monthrange(theyear, themonth)
         month_start = datetime.date(theyear, themonth, 1)
         month_end = datetime.date(theyear, themonth, last_day)
         events = models.CircuitMaintenance.objects.filter(
             start__date__lte=month_end,
             end__date__gte=month_start,
-        ).annotate(impact_count=Count('impact'))
+        ).annotate(impact_count=Count("impact"))
         v = []
         a = v.append
         a('<table class="table table-bordered">')
-        a('\n')
+        a("\n")
         a(self.formatmonthname(theyear, themonth))
-        a('\n')
+        a("\n")
         a(self.formatweekheader())
-        a('\n')
+        a("\n")
         for week in self.monthdays2calendar(theyear, themonth):
             a(self.formatweek(week, events))
-            a('\n')
-        a('</table>')
-        a('\n')
-        return ''.join(v)
+            a("\n")
+        a("</table>")
+        a("\n")
+        return "".join(v)
 
 
 # CircuitMaintenanceSchedule
-class CircuitMaintenanceScheduleView(PermissionRequiredMixin, View):
-    permission_required = 'netbox_circuitmaintenance.view_circuitmaintenance'
-    template_name = 'netbox_circuitmaintenance/calendar.html'
-    partial_template_name = 'netbox_circuitmaintenance/calendar_partial.html'
+class CircuitMaintenanceScheduleView(ObjectPermissionRequiredMixin, View):
+    queryset = models.CircuitMaintenance.objects.all()
+    template_name = "netbox_circuitmaintenance/calendar.html"
+    partial_template_name = "netbox_circuitmaintenance/calendar_partial.html"
+
+    def get_required_permission(self):
+        return "netbox_circuitmaintenance.view_circuitmaintenance"
 
     def get(self, request):
-        curr_month = datetime.date.today()
+        curr_month = django_timezone.now().date()
 
-        if request.GET.get('month'):
+        if request.GET.get("month"):
             month = int(request.GET["month"])
             year = int(request.GET["year"])
         else:
             month = curr_month.month
             year = curr_month.year
 
-        cal = Calendar(year, month)
+        cal = MaintenanceCalendar(year, month)
         html_calendar = cal.formatmonth(year, month)
 
         context = {
@@ -413,21 +450,26 @@ class CircuitMaintenanceScheduleView(PermissionRequiredMixin, View):
             "prev_year": cal.prev_year(month, year),
         }
 
-        template = self.partial_template_name if request.headers.get('HX-Request') else self.template_name
+        template = (
+            self.partial_template_name
+            if request.headers.get("HX-Request")
+            else self.template_name
+        )
         return render(request, template, context)
 
 
 # Historical Maintenance tab views for Circuit, Provider, and Site detail pages
 
-@register_model_view(Circuit, 'historical-maintenance')
+
+@register_model_view(Circuit, "historical-maintenance")
 class CircuitHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     queryset = Circuit.objects.all()
     child_model = CircuitMaintenanceImpact
     table = tables.CircuitMaintenanceImpactTable
     filterset = filtersets.CircuitMaintenanceImpactFilterSet
-    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    template_name = "netbox_circuitmaintenance/historical_maintenance_tab.html"
     tab = ViewTab(
-        label='Historical Maintenance',
+        label="Historical Maintenance",
         hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
             circuit=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
@@ -435,41 +477,49 @@ class CircuitHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     )
 
     def get_children(self, request, parent):
-        return self.child_model.objects.restrict(request.user, 'view').filter(
-            circuit=parent, circuitmaintenance__status__in=TERMINAL_STATUSES
-        ).order_by('-circuitmaintenance__end')
+        return (
+            self.child_model.objects.restrict(request.user, "view")
+            .filter(circuit=parent, circuitmaintenance__status__in=TERMINAL_STATUSES)
+            .order_by("-circuitmaintenance__end")
+        )
 
 
-@register_model_view(Provider, 'historical-maintenance')
+@register_model_view(Provider, "historical-maintenance")
 class ProviderHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     queryset = Provider.objects.all()
     child_model = CircuitMaintenanceImpact
     table = tables.CircuitMaintenanceImpactWithCircuitTable
     filterset = filtersets.CircuitMaintenanceImpactFilterSet
-    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    template_name = "netbox_circuitmaintenance/historical_maintenance_tab.html"
     tab = ViewTab(
-        label='Historical Maintenance',
+        label="Historical Maintenance",
         hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
-            circuitmaintenance__provider=obj, circuitmaintenance__status__in=TERMINAL_STATUSES
+            circuitmaintenance__provider=obj,
+            circuitmaintenance__status__in=TERMINAL_STATUSES,
         ).count(),
     )
 
     def get_children(self, request, parent):
-        return self.child_model.objects.restrict(request.user, 'view').filter(
-            circuitmaintenance__provider=parent, circuitmaintenance__status__in=TERMINAL_STATUSES
-        ).order_by('-circuitmaintenance__end')
+        return (
+            self.child_model.objects.restrict(request.user, "view")
+            .filter(
+                circuitmaintenance__provider=parent,
+                circuitmaintenance__status__in=TERMINAL_STATUSES,
+            )
+            .order_by("-circuitmaintenance__end")
+        )
 
 
-@register_model_view(Site, 'historical-maintenance')
+@register_model_view(Site, "historical-maintenance")
 class SiteHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     queryset = Site.objects.all()
     child_model = CircuitMaintenanceImpact
     table = tables.CircuitMaintenanceImpactWithCircuitTable
     filterset = filtersets.CircuitMaintenanceImpactFilterSet
-    template_name = 'netbox_circuitmaintenance/historical_maintenance_tab.html'
+    template_name = "netbox_circuitmaintenance/historical_maintenance_tab.html"
     tab = ViewTab(
-        label='Historical Maintenance',
+        label="Historical Maintenance",
         hide_if_empty=True,
         badge=lambda obj: CircuitMaintenanceImpact.objects.filter(
             Q(circuit__termination_a___site=obj) | Q(circuit__termination_z___site=obj),
@@ -478,7 +528,12 @@ class SiteHistoricalMaintenanceTabView(generic.ObjectChildrenView):
     )
 
     def get_children(self, request, parent):
-        return self.child_model.objects.restrict(request.user, 'view').filter(
-            Q(circuit__termination_a___site=parent) | Q(circuit__termination_z___site=parent),
-            circuitmaintenance__status__in=TERMINAL_STATUSES,
-        ).order_by('-circuitmaintenance__end')
+        return (
+            self.child_model.objects.restrict(request.user, "view")
+            .filter(
+                Q(circuit__termination_a___site=parent)
+                | Q(circuit__termination_z___site=parent),
+                circuitmaintenance__status__in=TERMINAL_STATUSES,
+            )
+            .order_by("-circuitmaintenance__end")
+        )
