@@ -10,7 +10,7 @@ include = ["netbox_circuitmaintenance", "netbox_circuitmaintenance.*"]
 [project]
 name = "netbox-circuitmaintenance"
 keywords = ['netbox_circuitmaintenance']
-version = "0.7.0"
+version = "0.8.0"
 description = "Provides the ability to record circuit maintenance, maintenance impact and maintenance notifications in Netbox and link them to Providers and Circuits."
 readme = "README.md"
 authors = [{ name = "Jason Yates", email = "me@jasonyates.co.uk" }]
@@ -55,7 +55,7 @@ Tracker = "https://github.com/jasonyates/netbox-circuitmaintenance/issues"
 
 
 [tool.bumpver]
-current_version = "0.7.0"
+current_version = "0.8.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true

@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.8.0
+
+### New Features
+- Added maintenance summary dashboard with stats cards, 14-day timeline and grouped-by-provider tables (#2)
+- Summary stat cards are clickable and link to filtered maintenance list views
+- Added unmatched notifications list view for triaging orphaned parser notifications (#16)
+- Notifications can now be created without an associated maintenance event (nullable FK)
+- Added provider timezone field to maintenance events, defaulting to UTC (#20)
+- Timezone displayed on maintenance detail page alongside start/end times
+- Timezone available in create, edit, bulk edit, filter forms and REST API
+- Added date range filters (`start_after` / `start_before`) to maintenance filterset
+- Added "Summary", "Maintenance Calendar" and "Unmatched Notifications" to plugin navigation menu
+- Renamed "Maintenance Schedule" to "Maintenance Calendar"
+
+### Dependencies
+- Added `django-timezone-field>=7.0`
+
+### Migration Notes
+- Migration `0009` makes the notification FK nullable (keeps CASCADE) and adds the `time_zone` field
+- All existing maintenance events are backfilled with `UTC` as the default timezone
+
 ## v0.7.0
 
 ### Breaking Changes

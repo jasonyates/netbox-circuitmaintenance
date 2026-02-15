@@ -8,16 +8,19 @@ The plugin does not directly provide an automated approach to ingesting provider
 
 ## Features
 
- - Track provider maintenance events
+ - Track provider maintenance events with provider timezone support
  - Track circuit impact from provider maintenance
- - Provides a consolidated view of active, upcoming and historical maintenance events at the provider and circuit level
- - Consolidated notifications (coming soon)
- - Maintenance overlap detection (coming soon)
+ - Maintenance summary dashboard with stats, timeline and grouped-by-provider views
+ - Maintenance calendar with ICS/iCal subscription feed
+ - Consolidated view of active, upcoming and historical maintenance at the provider and circuit level
+ - Unmatched notification triage queue for automated parser workflows
+ - Full REST API with timezone and nullable notification support
 
 ## Compatibility
-This plugin is only supported on NetBox 3.4 or higher, for exact compatibility information, see the table below.  
+This plugin is only supported on NetBox 3.4 or higher, for exact compatibility information, see the table below.
 | NetBox Version | Plugin Version |
 |--|--|
+| 4.4+ | 0.8.0 |
 | 4.4+ | 0.6.0 |
 | 4.2+ | 0.5.0 |
 | 4.0+ | 0.4.2 |
