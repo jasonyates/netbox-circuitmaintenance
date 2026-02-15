@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://jasonyates.github.io/netbox-circuitmaintenance/</loc>
+         <lastmod>2026-02-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jasonyates.github.io/netbox-circuitmaintenance/changelog/</loc>
+         <lastmod>2026-02-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jasonyates.github.io/netbox-circuitmaintenance/contributing/</loc>
+         <lastmod>2026-02-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jasonyates.github.io/netbox-circuitmaintenance/parsers/</loc>
+         <lastmod>2026-02-15</lastmod>
+    </url>
+    <url>
+         <loc>https://jasonyates.github.io/netbox-circuitmaintenance/parsers_sns_lambda/</loc>
+         <lastmod>2026-02-15</lastmod>
+    </url>
+</urlset>
