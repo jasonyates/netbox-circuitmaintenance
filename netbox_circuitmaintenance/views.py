@@ -1,13 +1,17 @@
 
+from collections import OrderedDict
+
 from netbox.views import generic
 from django.db.models import Count, Q
 from . import forms, models, tables, filtersets
+from .constants import ACTIVE_STATUSES
 from .models import CircuitMaintenanceImpact
 from django.views.generic import View
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render
 import datetime
 import calendar
+from django.utils import timezone as django_timezone
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 from utilities.views import register_model_view, ViewTab
@@ -78,6 +82,109 @@ class CircuitMaintenanceNotificationsDeleteView(generic.ObjectDeleteView):
 
 class CircuitMaintenanceNotificationView(generic.ObjectView):
     queryset = models.CircuitMaintenanceNotifications.objects.all()
+
+
+class CircuitMaintenanceNotificationsListView(generic.ObjectListView):
+    queryset = models.CircuitMaintenanceNotifications.objects.all()
+    table = tables.CircuitMaintenanceNotificationsTable
+    filterset = filtersets.CircuitMaintenanceNotificationsFilterSet
+    filterset_form = forms.CircuitMaintenanceNotificationsFilterForm
+
+
+class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):
+    permission_required = 'netbox_circuitmaintenance.view_circuitmaintenance'
+    template_name = 'netbox_circuitmaintenance/maintenance_summary.html'
+
+    def get(self, request):
+        now = django_timezone.now()
+        today = now.date()
+
+        # Week boundaries (Monday to Sunday)
+        week_start = today - datetime.timedelta(days=today.weekday())
+        week_end = week_start + datetime.timedelta(days=6)
+
+        # Stats
+        in_progress = models.CircuitMaintenance.objects.filter(status='IN-PROCESS').count()
+        confirmed_this_week = models.CircuitMaintenance.objects.filter(
+            status='CONFIRMED',
+            start__date__gte=week_start,
+            start__date__lte=week_end,
+        ).count()
+        upcoming_7 = models.CircuitMaintenance.objects.filter(
+            status__in=ACTIVE_STATUSES,
+            start__date__gte=today,
+            start__date__lte=today + datetime.timedelta(days=7),
+        ).count()
+        upcoming_30 = models.CircuitMaintenance.objects.filter(
+            status__in=ACTIVE_STATUSES,
+            start__date__gte=today,
+            start__date__lte=today + datetime.timedelta(days=30),
+        ).count()
+        unacknowledged = models.CircuitMaintenance.objects.filter(
+            status__in=ACTIVE_STATUSES,
+            acknowledged=False,
+        ).count()
+
+        # Timeline: active maintenance in next 14 days
+        timeline = models.CircuitMaintenance.objects.filter(
+            status__in=ACTIVE_STATUSES,
+            start__date__lte=today + datetime.timedelta(days=14),
+            end__date__gte=today,
+        ).annotate(
+            impact_count=Count('impact')
+        ).order_by('start')
+
+        # Upcoming by provider
+        upcoming_maintenance = models.CircuitMaintenance.objects.filter(
+            status__in=ACTIVE_STATUSES,
+            start__date__gte=today,
+        ).annotate(
+            impact_count=Count('impact')
+        ).order_by('provider__name', 'start')
+
+        grouped_by_provider = OrderedDict()
+        for maint in upcoming_maintenance:
+            provider_name = str(maint.provider)
+            grouped_by_provider.setdefault(provider_name, []).append(maint)
+
+        # Build filter URLs for clickable stat cards
+        # NetBox uses MultiValueCharFilter (BaseInFilter) which expects
+        # comma-separated values: ?status=VAL1,VAL2
+        list_url = reverse('plugins:netbox_circuitmaintenance:circuitmaintenance_list')
+        active_status_csv = ','.join(ACTIVE_STATUSES)
+        today_str = today.isoformat()
+        week_start_str = week_start.isoformat()
+        week_end_str = week_end.isoformat()
+        day7_str = (today + datetime.timedelta(days=7)).isoformat()
+        day30_str = (today + datetime.timedelta(days=30)).isoformat()
+
+        context = {
+            'in_progress': in_progress,
+            'confirmed_this_week': confirmed_this_week,
+            'upcoming_7': upcoming_7,
+            'upcoming_30': upcoming_30,
+            'unacknowledged': unacknowledged,
+            'timeline': timeline,
+            'grouped_by_provider': grouped_by_provider,
+            'in_progress_url': f'{list_url}?status=IN-PROCESS',
+            'confirmed_this_week_url': (
+                f'{list_url}?status=CONFIRMED'
+                f'&start_after={week_start_str}&start_before={week_end_str}'
+            ),
+            'upcoming_7_url': (
+                f'{list_url}?status={active_status_csv}'
+                f'&start_after={today_str}&start_before={day7_str}'
+            ),
+            'upcoming_30_url': (
+                f'{list_url}?status={active_status_csv}'
+                f'&start_after={today_str}&start_before={day30_str}'
+            ),
+            'unacknowledged_url': (
+                f'{list_url}?status={active_status_csv}&acknowledged=false'
+            ),
+        }
+
+        return render(request, self.template_name, context)
 
 
 class Calendar(calendar.HTMLCalendar):

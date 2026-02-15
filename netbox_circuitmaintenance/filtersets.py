@@ -1,3 +1,4 @@
+import django_filters
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from .models import (
@@ -8,12 +9,26 @@ from .models import (
 
 
 class CircuitMaintenanceFilterSet(NetBoxModelFilterSet):
+    time_zone = django_filters.CharFilter(
+        lookup_expr='exact',
+        label='Provider Timezone',
+    )
+    start_after = django_filters.DateTimeFilter(
+        field_name='start',
+        lookup_expr='gte',
+        label='Start After',
+    )
+    start_before = django_filters.DateTimeFilter(
+        field_name='start',
+        lookup_expr='lte',
+        label='Start Before',
+    )
 
     class Meta:
         model = CircuitMaintenance
         fields = (
             'id', 'name', 'summary', 'status', 'provider', 'start', 'end',
-            'internal_ticket', 'acknowledged',
+            'time_zone', 'internal_ticket', 'acknowledged',
         )
 
     def search(self, queryset, name, value):
@@ -43,10 +58,16 @@ class CircuitMaintenanceImpactFilterSet(NetBoxModelFilterSet):
 
 
 class CircuitMaintenanceNotificationsFilterSet(NetBoxModelFilterSet):
+    has_maintenance = django_filters.BooleanFilter(
+        field_name='circuitmaintenance',
+        lookup_expr='isnull',
+        exclude=True,
+        label='Associated to Maintenance',
+    )
 
     class Meta:
         model = CircuitMaintenanceNotifications
-        fields = ('id', 'email_body', 'subject', 'email_from', 'email_received')
+        fields = ('id', 'circuitmaintenance', 'email_body', 'subject', 'email_from', 'email_received')
 
     def search(self, queryset, name, value):
         if not value.strip():

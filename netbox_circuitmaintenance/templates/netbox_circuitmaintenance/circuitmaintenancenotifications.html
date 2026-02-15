@@ -20,7 +20,13 @@
             </tr>
             <tr>
                 <th scope="row">Maintenance</th>
-                <td><a href="{{ object.circuitmaintenance.get_absolute_url }}">{{ object.circuitmaintenance }}</a></td>
+                <td>
+                    {% if object.circuitmaintenance %}
+                        <a href="{{ object.circuitmaintenance.get_absolute_url }}">{{ object.circuitmaintenance }}</a>
+                    {% else %}
+                        <span class="text-muted">Not associated</span>
+                    {% endif %}
+                </td>
             </tr>
         </table>
     </div>

@@ -29,11 +29,15 @@
               </tr>
               <tr>
                 <th scope="row">Start Date/Time</th>
-                <td>{{ object.start }}</td>
+                <td>{{ object.start }}{% if object.time_zone %} <small class="text-muted">({{ object.time_zone }})</small>{% endif %}</td>
               </tr>
               <tr>
                 <th scope="row">End Date/Time</th>
-                <td>{{ object.end }}</td>
+                <td>{{ object.end }}{% if object.time_zone %} <small class="text-muted">({{ object.time_zone }})</small>{% endif %}</td>
+              </tr>
+              <tr>
+                <th scope="row">Provider Timezone</th>
+                <td>{{ object.time_zone }}</td>
               </tr>
               <tr>
                 <th scope="row">Internal Ticket #</th>

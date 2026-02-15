@@ -1,7 +1,7 @@
 import django_tables2 as tables
 
 from netbox.tables import NetBoxTable, columns
-from .models import CircuitMaintenance, CircuitMaintenanceImpact
+from .models import CircuitMaintenance, CircuitMaintenanceImpact, CircuitMaintenanceNotifications
 
 
 class CircuitMaintenanceTable(NetBoxTable):
@@ -23,7 +23,7 @@ class CircuitMaintenanceTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = CircuitMaintenance
-        fields = ('pk', 'id', 'name', 'summary', 'status', 'provider', 'start', 'end', 'internal_ticket', 'acknowledged', 'impact_count', 'actions')
+        fields = ('pk', 'id', 'name', 'summary', 'status', 'provider', 'start', 'end', 'time_zone', 'internal_ticket', 'acknowledged', 'impact_count', 'actions')
         default_columns = ('name', 'summary', 'provider', 'start', 'end', 'acknowledged', 'internal_ticket', 'status', 'impact_count')
 
 
@@ -62,3 +62,15 @@ class CircuitMaintenanceImpactWithCircuitTable(CircuitMaintenanceImpactTable):
     class Meta(CircuitMaintenanceImpactTable.Meta):
         fields = ('circuitmaintenance', 'circuit', 'maintenance_start', 'maintenance_end', 'maintenance_status', 'impact')
         default_columns = ('circuitmaintenance', 'circuit', 'maintenance_start', 'maintenance_end', 'maintenance_status', 'impact')
+
+
+class CircuitMaintenanceNotificationsTable(NetBoxTable):
+    subject = tables.Column(linkify=True)
+    circuitmaintenance = tables.Column(verbose_name='Maintenance', linkify=True)
+    email_from = tables.Column(verbose_name='From')
+    email_received = tables.Column(verbose_name='Received')
+
+    class Meta(NetBoxTable.Meta):
+        model = CircuitMaintenanceNotifications
+        fields = ('pk', 'id', 'subject', 'circuitmaintenance', 'email_from', 'email_received', 'actions')
+        default_columns = ('subject', 'circuitmaintenance', 'email_from', 'email_received')

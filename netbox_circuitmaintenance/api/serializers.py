@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
+from timezone_field.rest_framework import TimeZoneSerializerField
 from ..models import (
     CircuitMaintenance,
     CircuitMaintenanceImpact,
@@ -14,12 +15,13 @@ class CircuitMaintenanceSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenance-detail'
     )
     provider = ProviderSerializer(nested=True)
+    time_zone = TimeZoneSerializerField(required=False)
 
     class Meta:
         model = CircuitMaintenance
         fields = (
             'id', 'url', 'display', 'name', 'summary', 'status', 'provider',
-            'start', 'end', 'internal_ticket', 'acknowledged', 'comments',
+            'start', 'end', 'time_zone', 'internal_ticket', 'acknowledged', 'comments',
             'tags', 'custom_fields', 'created', 'last_updated',
         )
         brief_fields = ('id', 'url', 'display', 'name', 'status', 'provider', 'start', 'end')
@@ -45,7 +47,7 @@ class CircuitMaintenanceNotificationsSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_circuitmaintenance-api:circuitmaintenancenotifications-detail'
     )
-    circuitmaintenance = CircuitMaintenanceSerializer(nested=True)
+    circuitmaintenance = CircuitMaintenanceSerializer(nested=True, required=False, allow_null=True)
 
     class Meta:
         model = CircuitMaintenanceNotifications

@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from netbox.models import NetBoxModel
 from utilities.choices import ChoiceSet
 from django.urls import reverse
+from timezone_field import TimeZoneField
 
 class CircuitMaintenanceTypeChoices(ChoiceSet):
 
@@ -65,6 +66,12 @@ class CircuitMaintenance(NetBoxModel):
         help_text='End date and time of the maintenance event e.g. 2022-12-26 14:30'
     )
 
+    time_zone = TimeZoneField(
+        default='UTC',
+        verbose_name="Provider Timezone",
+        help_text="The provider's local timezone for this maintenance (informational only; times remain in UTC)"
+    )
+
     internal_ticket = models.CharField(
         max_length=100,
         verbose_name="Internal Ticket #",
@@ -83,7 +90,7 @@ class CircuitMaintenance(NetBoxModel):
     )
 
     clone_fields = (
-        'status', 'provider', 'acknowledged',
+        'status', 'provider', 'acknowledged', 'time_zone',
     )
 
     class Meta:
@@ -163,6 +170,8 @@ class CircuitMaintenanceNotifications(NetBoxModel):
         on_delete=models.CASCADE,
         related_name='notification',
         verbose_name="Circuit Maintenance ID",
+        null=True,
+        blank=True,
     )
 
     email = models.BinaryField()

@@ -1,0 +1,145 @@
+{% extends 'generic/_base.html' %}
+
+{% block title %}Summary{% endblock %}
+
+{% block tabs %}{% endblock %}
+
+{% block content %}
+
+{# Stats Cards #}
+<div class="row mb-4">
+    <div class="col">
+        <a href="{{ in_progress_url }}" class="text-decoration-none">
+            <div class="card{% if in_progress %} border-warning{% endif %}">
+                <div class="card-body text-center">
+                    <h2 class="{% if in_progress %}text-warning{% else %}text-muted{% endif %}">{{ in_progress }}</h2>
+                    <small class="text-muted">In Progress Now</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ confirmed_this_week_url }}" class="text-decoration-none">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2>{{ confirmed_this_week }}</h2>
+                    <small class="text-muted">Confirmed This Week</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ upcoming_7_url }}" class="text-decoration-none">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2>{{ upcoming_7 }}</h2>
+                    <small class="text-muted">Upcoming (7 Days)</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ upcoming_30_url }}" class="text-decoration-none">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2>{{ upcoming_30 }}</h2>
+                    <small class="text-muted">Upcoming (30 Days)</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a href="{{ unacknowledged_url }}" class="text-decoration-none">
+            <div class="card{% if unacknowledged %} border-danger{% endif %}">
+                <div class="card-body text-center">
+                    <h2 class="{% if unacknowledged %}text-danger{% else %}text-muted{% endif %}">{{ unacknowledged }}</h2>
+                    <small class="text-muted">Unacknowledged</small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+{# Next 14 Days Timeline #}
+<div class="row mb-4">
+    <div class="col col-md-12">
+        <div class="card">
+            <h5 class="card-header">Next 14 Days</h5>
+            <div class="card-body">
+                {% if timeline %}
+                <div class="list-group list-group-flush">
+                    {% for maint in timeline %}
+                    <a href="{{ maint.get_absolute_url }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div>
+                                <span class="badge text-bg-{{ maint.get_status_color }} me-2">{{ maint.get_status_display }}</span>
+                                <strong>{{ maint.name }}</strong>
+                                <span class="text-muted ms-2">{{ maint.provider }}</span>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-secondary">{{ maint.impact_count }} impacted</span>
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ maint.start }} &mdash; {{ maint.end }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-muted">No maintenance events in the next 14 days.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Upcoming by Provider #}
+<div class="row mb-4">
+    <div class="col col-md-12">
+        <div class="card">
+            <h5 class="card-header">Upcoming by Provider</h5>
+            <div class="card-body">
+                {% if grouped_by_provider %}
+                    {% for provider_name, maintenances in grouped_by_provider.items %}
+                    <h6 class="mt-3 mb-2">{{ provider_name }}</h6>
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Maintenance ID</th>
+                                <th>Summary</th>
+                                <th>Status</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Impacted</th>
+                                <th>Acknowledged</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for maint in maintenances %}
+                            <tr>
+                                <td><a href="{{ maint.get_absolute_url }}">{{ maint.name }}</a></td>
+                                <td>{{ maint.summary|truncatewords:10 }}</td>
+                                <td><span class="badge text-bg-{{ maint.get_status_color }}">{{ maint.get_status_display }}</span></td>
+                                <td>{{ maint.start }}</td>
+                                <td>{{ maint.end }}</td>
+                                <td>{{ maint.impact_count }}</td>
+                                <td>
+                                    {% if maint.acknowledged %}
+                                        <span class="text-success"><i class="mdi mdi-check-circle"></i></span>
+                                    {% else %}
+                                        <span class="text-danger"><i class="mdi mdi-close-circle"></i></span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                {% else %}
+                <div class="text-muted">No upcoming maintenance events.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

@@ -104,7 +104,7 @@ class CircuitMaintenanceModelTest(TestCase):
         m.clean()
 
     def test_clone_fields(self):
-        expected = ('status', 'provider', 'acknowledged')
+        expected = ('status', 'provider', 'acknowledged', 'time_zone')
         self.assertEqual(CircuitMaintenance.clone_fields, expected)
 
 

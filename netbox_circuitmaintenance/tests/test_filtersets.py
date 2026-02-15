@@ -20,7 +20,7 @@ from ..models import (
 class CircuitMaintenanceFilterSetTest(TestCase, ChangeLoggedFilterSetTests):
     queryset = CircuitMaintenance.objects.all()
     filterset = CircuitMaintenanceFilterSet
-    ignore_fields = ('provider',)
+    ignore_fields = ('provider', 'time_zone', 'start_after', 'start_before')
 
     @classmethod
     def setUpTestData(cls):
