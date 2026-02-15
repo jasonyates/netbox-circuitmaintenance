@@ -85,10 +85,13 @@ class CircuitMaintenanceNotificationView(generic.ObjectView):
 
 
 class CircuitMaintenanceNotificationsListView(generic.ObjectListView):
-    queryset = models.CircuitMaintenanceNotifications.objects.all()
+    queryset = models.CircuitMaintenanceNotifications.objects.filter(
+        circuitmaintenance__isnull=True
+    )
     table = tables.CircuitMaintenanceNotificationsTable
     filterset = filtersets.CircuitMaintenanceNotificationsFilterSet
     filterset_form = forms.CircuitMaintenanceNotificationsFilterForm
+    template_name = 'netbox_circuitmaintenance/unmatched_notifications_list.html'
 
 
 class CircuitMaintenanceSummaryView(PermissionRequiredMixin, View):

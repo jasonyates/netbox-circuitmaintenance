@@ -73,4 +73,6 @@ class CircuitMaintenanceNotificationsTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = CircuitMaintenanceNotifications
         fields = ('pk', 'id', 'subject', 'circuitmaintenance', 'email_from', 'email_received', 'actions')
-        default_columns = ('subject', 'circuitmaintenance', 'email_from', 'email_received')
+        default_columns = ('subject', 'email_from', 'email_received')
+        verbose_name = 'Unmatched Notification'
+        verbose_name_plural = 'Unmatched Notifications'

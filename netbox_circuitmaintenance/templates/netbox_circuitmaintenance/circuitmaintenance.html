@@ -143,7 +143,7 @@
                             <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification' pk=email.pk %}" class="btn btn-primary btn-sm lh-1" title="View Notification" target="_blank">
                                 <i class="mdi mdi-book" aria-hidden="true"></i>
                               </a>
-                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">
+                              <a href="{% url 'plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_delete' pk=email.pk %}?return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-danger btn-sm lh-1" title="Delete Notification">
                                 <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i>
                               </a>
                           </td>
@@ -160,7 +160,7 @@
         </div>
         {% if object.status != 'COMPLETED' and  object.status != 'CANCELLED' %}
         <div class="card-footer text-end noprint">
-            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitnotification_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
+            <a href="{% url 'plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_add' %}?circuitmaintenance={{ object.pk }}&return_url={% url 'plugins:netbox_circuitmaintenance:circuitmaintenance' pk=object.pk %}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a Maintenance Notification
             </a>
           </div>

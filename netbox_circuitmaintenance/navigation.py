@@ -24,10 +24,10 @@ menuitems = [
     ),
     PluginMenuItem(
         link='plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_list',
-        link_text='Notifications',
+        link_text='Unmatched Notifications',
         buttons=[
             PluginMenuButton(
-                link='plugins:netbox_circuitmaintenance:circuitnotification_add',
+                link='plugins:netbox_circuitmaintenance:circuitmaintenancenotifications_add',
                 title='Add',
                 icon_class='mdi mdi-plus-thick',
                 color=ButtonColorChoices.GREEN
